@@ -71,5 +71,7 @@ ccs_clean = ccs |>
   # Filter for just British Columbia/BC/Pacific
   dplyr::filter(stringr::str_detect(`Canadian range / known or potential jurisdictions`,"(British Columbia|BC|Pacific)"))
   
-  
-
+# Write files out to Teams folder
+write.csv(frr_clean, "output/frr_clean.csv", row.names = F)
+write.csv(csrp_clean, "output/csrp_clean.csv", row.names = F)
+write.csv(ccs_clean, "output/ccs_clean.csv", row.names = F)
