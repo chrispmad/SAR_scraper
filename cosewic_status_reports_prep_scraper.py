@@ -71,3 +71,5 @@ df.to_csv("data/cosewic_status_reports_prep.csv")
 
 # Close the robotically controlled internet browser.
 driver.quit()
+
+# %%
