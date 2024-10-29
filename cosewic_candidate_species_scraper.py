@@ -96,72 +96,6 @@ print(df)
 # %%
 df.to_csv("data/candidate_species_tbl.csv")
 
-
-# %%
-
-def is_text_bold(driver, element):
-    script = """
-        return window.getComputedStyle(arguments[0]).fontWeight === 'bold';
-    """
-    return driver.execute_script(script, element)
-
-def get_row_text_size(row):
-    cell_sizes = []
-    for cell in row.find_elements(By.TAG_NAME, "td"):
-        font_size = cell.value_of_css_property("font-size")
-        cell_sizes.append(font_size)
-    return cell_sizes
-
-
-def parse_table(table_element):
-    table_data = []
-    current_h3 = None
-    current_strong = None
-
-    for row in table_element.find_elements(By.TAG_NAME, "tr"):
-        
-        cells = row.find_elements(By.TAG_NAME, "td")
-
-        if not cells:
-            continue  # Skip rows with no cells
-
-        # Handle single-cell rows (e.g., headings)
-        if len(cells) >= 1:
-            try:
-                h3_element = cells[0].find_element(By.TAG_NAME, "h3")
-                if h3_element:
-                    current_h3 = h3_element.text.strip()
-            except NoSuchElementException:
-                pass  # Handle cases where h3 is not found
-
-        elif len(cells) == 3:
-            current_strong = [strong.text.strip() for strong in cells]
-                
-        else:
-            # Handle rows with colspan
-            if cells[0].get_attribute("colspan") == "3":
-                current_h3 = cells[0].text.strip()
-            else:
-                # Handle regular data rows
-                row_data = []
-                if current_h3:
-                    row_data.append(current_h3)  # Add the current h3 to the beginning
-                for cell in cells:
-                    cell_text = cell.text.strip()
-                    is_bold = cell.find_element(By.TAG_NAME, "b") is not None
-                    row_data.append((cell_text, is_bold))
-                table_data.append(row_data)
-
-    return table_data
- 
-table_xpath = "//*[@id='ca-1529739248826']/main/div/div[2]/table"
-table_element = driver.find_element(By.XPATH, table_xpath) 
- 
-parsed_data = parse_table(table_element)
-
-print(parsed_data)     
-#table_data.to_csv("data/table_three_species_specialist.csv")
-    
     
 #%%
 table_xpath = "//*[@id='ca-1529739248826']/main/div/div[2]/table"
@@ -223,9 +157,11 @@ def parse_table(table_element):
 
 table_data = parse_table(table_element)
 
+# get rid of the numbers in front of the type of organism
 def clean_category(category):
     return re.sub(r'\(\d+\)', '', category).strip()
 
+#naming the items in the lists so they can be referred to. Species also includes location
 def tuple_to_dict(tup):
     return {
         'category': clean_category(tup[0]),
@@ -245,7 +181,7 @@ for sublist in table_data:
         *(d['species'] for d in dict_list)      # Species and location
     ]
     csv_data.append(row)
-
+#header names for the csv file
 header = ['Group', 'Priority', 'Common name', 'Scientific Name', 'Location']
 
 with open('data/cosewic_spp_specialist_candidate_list.csv', 'w', newline='') as file:
