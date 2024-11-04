@@ -16,10 +16,6 @@ import os
 
 
 #%%
-AIRTABLE_USERNAME=your_username
-AIRTABLE_PASSWORD=your_password
-
-#%%
 
 driver = webdriver.Chrome()
 
@@ -46,7 +42,7 @@ sign_button = driver.find_element(By.XPATH, "//*[@id='sign-in-form-fields-root']
 user_pw.clear()
 user_pw.send_keys(password)
 sign_button.click()
-
+time.sleep(1)
 
 
 # %%
@@ -57,5 +53,5 @@ def import_new_csv(fileToImport):
 
 
 #%%   
-
+with open("data/cosewic_spp_specialist_candidate_list.csv") as 
 import_new_csv
