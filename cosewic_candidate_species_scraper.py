@@ -182,7 +182,7 @@ for sublist in table_data:
     ]
     csv_data.append(row)
 #header names for the csv file
-header = ['Group', 'Priority', 'Common name', 'Scientific Name', 'Location']
+header = ['Group', 'Priority', 'Common name', 'Scientific name', 'Location']
 
 with open('data/cosewic_spp_specialist_candidate_list.csv', 'w', newline='') as file:
     writer = csv.writer(file)
