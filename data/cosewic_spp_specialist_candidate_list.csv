@@ -1,4 +1,4 @@
-Group,Priority,Common name,Scientific Name,Location
+Group,Priority,Common name,Scientific name,Location
 Amphibians,Group 1 - High priority candidates,Canadian Toad,Anaxyrus hemiophrys,"AB, CWS, MB, NT, Parks, SK"
 Amphibians,Group 1 - High priority candidates,Plains Spadefoot,Spea bombifrons,"AB, CWS, MB, Parks, SK"
 Amphibians,Group 2 - Mid priority candidates,Northwestern Salamander,Ambystoma gracile,"BC, CWS, Parks"
@@ -274,7 +274,7 @@ Marine fishes,Group 2 - Mid priority candidates,Sockeye Salmon (Vancouver Island
 Marine fishes,Group 2 - Mid priority candidates,Darkblotched Rockfish,Sebastes crameri,"BC, CMN, CWS, DFO, NJFMC, Parks, Pacific Ocean"
 Marine fishes,Group 2 - Mid priority candidates,Canary Rockfish,Sebastes pinniger,"BC, CMN, CWS, DFO, Parks, Pacific Ocean"
 Marine fishes,Group 2 - Mid priority candidates,Spiny Dogfish,Squalus acanthias,"Atlantic Ocean, CMN, CWS, DFO, NB, NL, NS, Parks, PE"
-Marine fishes,Group 3 - Low priority candidates,No candidates currently listed
+Marine fishes,Group 3 - Low priority candidates,No candidates currently listed,,
 Marine mammals,Group 1 - High priority candidates,Guadalupe Fur Seal,Arctocephalus townsendi,"CWS, DFO, Parks, Pacific Ocean"
 Marine mammals,Group 1 - High priority candidates,Hooded Seal,Cystophora cristata,"Arctic Ocean, Atlantic Ocean, CWS, DFO, NU, NWMB, Parks"
 Marine mammals,Group 1 - High priority candidates,Bearded Seal,Erignathus barbatus,"Arctic Ocean, CWS, DFO, FJMC, HFTCC, MB, NL, NT, NU, NWMB, ON, Parks, QC, YT"
@@ -330,7 +330,7 @@ Mosses,Group 2 - Mid priority candidates,(common name not available),Scapania or
 Mosses,Group 3 - Low priority candidates,(common name not available),Fabronia ciliaris,"CWS, MB, Parks"
 Mosses,Group 3 - Low priority candidates,Funaria Moss,Funaria flavicans,"CWS, ON, Parks"
 Mosses,Group 3 - Low priority candidates,(common name not available),Trematodon longicollis,"CWS, NL, ON, Parks"
-Reptiles,Group 1 - High priority candidates,No candidates currently listed
+Reptiles,Group 1 - High priority candidates,No candidates currently listed,,
 Reptiles,Group 2 - Mid priority candidates,Ring-necked Snake,Diadophis punctatus,"CWS, MB, NB, NS, ON, Parks, QC"
 Reptiles,Group 2 - Mid priority candidates,Smooth Greensnake,Opheodrys vernalis,"CWS, MB, NB, NS, ON, Parks, PE, QC, SK"
 Reptiles,Group 2 - Mid priority candidates,Plains Gartersnake,Thamnophis radix,"AB, CWS, MB, Parks, SK"
@@ -364,4 +364,4 @@ Vascular plants,Group 1 - High priority candidates,Short-stemmed Iris,Iris brevi
 Vascular plants,Group 1 - High priority candidates,Cranefly Orchid,Tipularia discolor,"CMN, CWS, ON, Parks"
 Vascular plants,Group 1 - High priority candidates,Dwarf Western Trillium,Trilium ovatum hibbersonii,"BC, CWS, Parks"
 Vascular plants,Group 2 - mid priority candidates and group 3 - low priority candidates,"An expanded Vascular Plants candidate list of over 500 vascular plants, grouped into two priority classes, is now available to the public in an Excel worksheet file. This list is provided with the understanding that it is a working copy undergoing modification. In preparing the list, information from the General Status of Species in Canada Review process, undertaken by all federal, provincial and territorial jurisdictions, is taken into account when species are ranked for inclusion on the list.
-Please contact the COSEWIC secretariat for a copy of the list at cosewic-cosepac@ec.gc.ca"
+Please contact the COSEWIC secretariat for a copy of the list at cosewic-cosepac@ec.gc.ca",,

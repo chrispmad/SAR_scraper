@@ -1,45 +1,24 @@
 #%%
-import os
-from pyairtable import Api
-from airtable import Airtable
-import requests
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException
+from webdriver_manager.chrome import ChromeDriverManager
 import pandas as pd
-import csv
 import time
-import json
-
-# %%
-with open("login/airtable_key.txt") as f:
-    lines = f.readlines()
-    username = lines[0].strip()
-    token = lines[1].strip()
-    print(f"USERNAME = {username}")
-
-
-base_id = 'appiMHrjH9cntzZC7' # the base of the workspace - change as appropriate
-table_id = 'tblaXWXnP0t9Ggdze' # change
-view_id = 'viwcjEPJe70stwTwe?blocks=hide' # change
-unique_field = "Scientific name"
-
-
-airtable_url = f"https://api.airtable.com/v0/{base_id}"
-
-# %%
-# Define the API endpoint and headers
-url = f"https://api.airtable.com/v0/{base_id}/{table_id}"
-headers = {
-    "Authorization": f"Bearer {token}",
-    "Content-Type": "application/json"
-}
-
-#with open("data/cosewic_spp_specialist_candidate_list.csv") as f:
-#    csvFile = csv.reader(f)
-#    for lines in csvFile:
-#        print(lines)
-          
-fileToAdd = pd.read_csv("data/cosewic_spp_specialist_candidate_list.csv", encoding='ISO-8859-1')      
+import csv
+import re
+import os
 
 #%%
+
+# This will pull the table from airtable and check if they already exist in the file to be uploaded
+# the url, table, headers, and params all need to be set outside of this function 
+# the unique field is the parameter that you are searching for - again set outside the function.
 def get_existing_records():
     records = []
     offset = None
@@ -58,30 +37,12 @@ def get_existing_records():
             break
     # Extract the unique field from each record
     existing_ids = {record['fields'].get(unique_field): record['id'] for record in records if unique_field in record['fields']}
-    return existing_ids    
-# %%
-
-existing_records = get_existing_records()
+    return existing_ids
 
 #%%
-for index, row in fileToAdd.iterrows():
-    unique_value = row[unique_field]
-    if unique_value in existing_records:
-        print(f"{index} with {unique_field} already exsists. Skipping...")
-        continue
-    
-    data = {
-        "fields":row.to_dict()
-    }
-    response = requests.post(url, headers=headers, data = json.dumps(data))
-    
-    if response.status_code != 200:
-        print(f"Error uploading row {index}: {response.json()}")
-    time.sleep(0.2)
-    
-    
-# %%
-
+# Deletes a record from Airtable, based on the column name and the string you pass it.
+# takes the name of the column to use a unique identifier - if you delete Group - Amphibians, then they will all get deleted
+# urls etc need to be set before hand.
 def delete_record_by_col(column_name, target_value):
     
      # Airtable formula to filter records with the target value in the specified column
@@ -118,10 +79,8 @@ def delete_record_by_col(column_name, target_value):
     
     return results
 
-
-# %%
-delete_record_by_col("Scientific name", "Spea bombifrons")
-# %%
+#%%
+# upload the data to the airtable table that has been identified. Make sure they are not existing records.
 def upload_data(file_to_add, unique_field, existing_records):
     
     for index, row in file_to_add.iterrows():
@@ -148,8 +107,3 @@ def upload_data(file_to_add, unique_field, existing_records):
 
         # Sleep to respect rate limits of the Airtable API
         time.sleep(0.2)
-
-
-#%%
-upload_data(fileToAdd, unique_field , existing_records)
-##sdadas 
