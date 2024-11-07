@@ -66,6 +66,7 @@ def get_existing_records():
 #delete records
 # %%
 
+
 def delete_record_by_col(column_name, target_value):
     
      # Airtable formula to filter records with the target value in the specified column
