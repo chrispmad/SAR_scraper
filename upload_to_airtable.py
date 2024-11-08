@@ -105,7 +105,14 @@ def delete_record_by_col(column_name, target_value):
 
 # %%
 
-fileToAdd = pd.read_csv("data/cosewic_status_reports_prep.csv", encoding='utf-8-sig')      
+fileToAdd = pd.read_csv("data/risk_registry.csv", encoding='utf-8-sig')      
+
+copydata = fileToAdd
+search_string = ["BC" , "British Columbia" , "Pacific", "British"]
+
+fileToAdd = copydata[copydata.apply(lambda row: row.str.contains(
+    '|'.join(search_string), case = False)).any(axis=1)]
+
 
 #fileToAdd = pd.read_csv("data/cosewic_spp_specialist_candidate_list.csv", encoding='ISO-8859-1')      
 
