@@ -8,33 +8,10 @@ import time
 import json
 
 
-# This will pull the table from airtable and check if they already exist in the file to be uploaded
-# the url, table, headers, and params all need to be set outside of this function 
-# the unique field is the parameter that you are searching for - again set outside the function.
-def get_existing_records():
-    records = []
-    offset = None
-    
-    while True:
-        params = {"offset": offset} if offset else {}
-        response = requests.get(url, headers = headers, params = params)
-        if response.status_code !=200:
-            print("Error fetching records: ", response.json())
-            return records
-        data = response.json()
-        records.extend(data['records'])
-        
-        offset = data.get("offset")
-        if not offset:
-            break
-    # Extract the unique field from each record
-    existing_ids = {record['fields'].get(unique_field): record['id'] for record in records if unique_field in record['fields']}
-    return existing_ids
-
 # Deletes a record from Airtable, based on the column name and the string you pass it.
 # takes the name of the column to use a unique identifier - if you delete Group - Amphibians, then they will all get deleted
 # urls etc need to be set before hand.
-def delete_record_by_col(column_name, target_value):
+def delete_record_by_col(url, base_id, table_id, headers, column_name, target_value):
     
      # Airtable formula to filter records with the target value in the specified column
     params = {
@@ -72,7 +49,7 @@ def delete_record_by_col(column_name, target_value):
 
 
 # upload the data to the airtable table that has been identified. Make sure they are not existing records.
-def upload_data(file_to_add):
+def upload_data(url, base_id, table_id, headers, file_to_add):
     
     for index, row in file_to_add.iterrows():
            
@@ -92,3 +69,38 @@ def upload_data(file_to_add):
 
         # Sleep to respect rate limits of the Airtable API
         time.sleep(0.2)
+
+def fetch_records(url, headers, base_id, table_id):
+    records = []
+    
+    while True:
+        response = requests.get(url, headers=headers)
+        response_json = response.json()
+        records.extend(response_json.get('records', []))
+        
+        offset = response_json.get('offset')
+        if not offset:
+            break
+        url = f'https://api.airtable.com/v0/{base_id}/{table_id}?offset={offset}'
+    return records
+
+def delete_records(url, base_id, table_id, headers, records):
+    record_id_to_delete = [record['id'] for record in records]
+    batch_size = 10
+    #print(record_id_to_delete)
+    for i in range(0, len(record_id_to_delete), batch_size):
+        print(record_id_to_delete[i:i+batch_size])
+        batch = record_id_to_delete[i:i+batch_size]
+        url = f'https://api.airtable.com/v0/{base_id}/{table_id}?' + '&'.join([f'records[]={id}' for id in batch])
+        response = requests.delete(url=url, headers=headers)
+        if response.status_code == 200:
+            print(f"Successfully deleted batch: {batch}")
+        else:
+            print(f"Error deleting batch. Response: {response.text}")    
+
+            
+def create_unique_id(df):
+    df['UniqueID'] = df.apply(lambda row: 
+                              f"{row['Scientific name']} - {row['COSEWIC common name'] or '<blank>'} - {row['COSEWIC population'] or row['Legal population']}", 
+                              axis=1)
+    return df      
