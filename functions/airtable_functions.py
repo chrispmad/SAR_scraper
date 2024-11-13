@@ -101,6 +101,26 @@ def delete_records(url, base_id, table_id, headers, records):
             
 def create_unique_id(df):
     df['UniqueID'] = df.apply(lambda row: 
-                              f"{row['Scientific name']} - {row['COSEWIC common name'] or '<blank>'} - {row['COSEWIC population'] or row['Legal population']}", 
-                              axis=1)
-    return df      
+        f"{row['Scientific name']} - {row['COSEWIC common name'] or '<blank>'} - {row['COSEWIC population'] or row['Legal population'] or '<blank>'}", 
+        axis=1)
+    return df  
+
+def determine_cosewic_domain(row):
+    taxonomic_group = row['Taxonomic group']
+    common_name = row['COSEWIC common name']
+    if taxonomic_group == 'Molluscs':
+        if any(name in common_name for name in ['abalone', 'oyster', 'mussel', 'lanx', 'capshell', 'Hot Springs Snail',
+                                                'Abalone', 'Oyster', 'Mussel', 'Lanx', 'Capshell', 'Hot Springs Snail']):
+            return 'Aquatic'
+        else:
+            return 'Terrestrial'
+    elif any(group in taxonomic_group for group in ['Fishes (freshwater)', 'Fishes (marine)', 'Mammals (marine)']):
+        return 'Aquatic'
+    elif any(group in taxonomic_group for group in ['Amphibians', 'Arthropods', 'Birds', 'Lichens', 'Mammals (terrestrial)', 'Mosses', 'Reptiles', 'Vascular Plants']):
+        return 'Terrestrial'
+    else:
+        return ''
+    
+def reassessment_date(row):
+    last_assesement = row['COSEWIC last assessment date']
+    

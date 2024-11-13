@@ -21,6 +21,11 @@ cosspp = read_csv("data/cosewic_spp_specialist_candidate_list.csv")
 
 # =======================
 
+
+
+
+
+
 # Apply filtering and creation of new column steps as outlined by Chrissy
 
 # 1. FRR
