@@ -18,7 +18,7 @@ with open("login/airtable_key.txt") as f:
 fileToAdd = pd.read_csv("data/risk_registry.csv", encoding='utf-8-sig')      
 #fileToAdd = pd.read_csv("data/cosewic_spp_specialist_candidate_list.csv", encoding='ISO-8859-1')  
 
-base_id = 'applZn1P0abVQM8NC' # the base of the workspace - change as appropriate
+base_id = 'applZn1P0abVQM8NC' # the base of the workspace - change as appropriate 
 table_id = 'tblmLlhGM6XKVo7WI' # Risk registry
 
 # Define the API endpoint and headers

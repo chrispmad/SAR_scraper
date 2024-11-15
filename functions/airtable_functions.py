@@ -5,6 +5,9 @@ import pandas as pd
 import csv
 import time
 import json
+import numpy as np
+import re
+import datetime
 
 
 # Deletes a record from Airtable, based on the column name and the string you pass it.
@@ -151,6 +154,39 @@ def determine_cosewic_domain(row):
     else:
         return ""
 
-
+# Function to get suggested re-assessment date
 def reassessment_date(row):
-    last_assesement = row["COSEWIC last assessment date"]
+
+    last_assesement = pd.to_datetime( row["COSEWIC last assessment date"])
+    return (last_assesement + pd.DateOffset(years = 10))
+
+
+    
+def extract_date(group_text):
+    date_match = re.search(r"(\w+ \d{4})", group_text)
+    if date_match:
+        month_str, year_str = date_match.group(1).split()
+        year = int(year_str)
+        month = datetime.datetime.strptime(month_str, '%B').month
+        date_obj = datetime.date(year, month, 1)
+        return date_obj.strftime('%Y-%m-%d')  # Format the date as YYYY-MM-DD
+    else:
+        return "No date found"
+     
+     
+     # Function to prioritize columns with suffix 'x'
+def prioritize_x_column(df):
+    # for each column in the dataframe
+    for col in df.columns:
+        #is the column name ends in x,
+        if col.endswith('_x'):
+            #the _X is removed and this forms thew new column name. Then it used the data
+            # in the column to fill this new colum in.
+            df[col[:-2]] = df[col]
+            # if the column ends in a y
+        elif col.endswith('_y'):
+            # if the cell is empty, fill it in with what is in y.
+            df[col[:-2]] = df[col].fillna(df[col[:-2]])
+            # drop the names ending in _x or _y
+    df.drop(df.filter(regex='_x|_y').columns, axis=1, inplace=True)
+    
