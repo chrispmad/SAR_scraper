@@ -3,6 +3,7 @@ import pandas as pd
 import functions.airtable_functions as airfuncs
 import re  # Regular expressions!
 import numpy as np
+import datetime
 
 risk_registry = pd.read_csv("data/risk_registry.csv", encoding="utf-8-sig")
 candidate_list = pd.read_csv(
@@ -109,6 +110,16 @@ risk_registry = risk_registry[
     cols_first + [col for col in risk_registry.columns if col not in cols_first]
 ]
 
+
+
+
+
+
+
+
+
+
+#%%
 ### COSEWIC Status reports
 
 # Replace any occurrences of 'Populations' in the population field.
@@ -178,13 +189,29 @@ status_report["COSEWIC status"] = status_report["Last assessment"]
 status_report["COSEWIC status"] = np.where(
     status_report["COSEWIC status"].str.contains("Not applicable"), "No status", ""
 )
+#rename the column
+status_report = status_report.rename(columns={'Last assessment': 'COSEWIC last assessment'})
+
+
+# gets the date and adds a Day value of "01" as per Chrissy
+status_report['Scheduled Assessment'] = status_report['Group'].apply(airfuncs.extract_date)
+
+
+#Merge the tables here
+#%%
+risk_status_merged = pd.merge(risk_registry, status_report[["Unique_ID","Domain", "Taxonomic group", "Scientific name", "COSEWIC common name",
+                                                           "COSEWIC population", "COSEWIC status",
+                                                           "Scheduled Assessment"]], on="Unique_ID", how = "outer")
+#This function will take the newly merged table and retain anything that is in risk registry but also in status_reports.
+# If the field is empty in risk registry, then it will use what is in status_report. Then the column names are fixed, to remove the x and y 
+airfuncs.prioritize_x_column(risk_status_merged)
 
 # %%
-fileToAdd = fileToAdd[
+""" fileToAdd = fileToAdd[
     fileToAdd.apply(
         lambda row: row.str.contains("|".join(search_string), case=False)
     ).any(axis=1)
-]
+] """
 
-airfuncs.reassessment_date(risk_registry[:1])
+
 # %%
