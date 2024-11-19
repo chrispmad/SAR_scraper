@@ -5,6 +5,13 @@ import re  # Regular expressions!
 import numpy as np
 import datetime
 import csv
+from pyairtable import Api
+from airtable import Airtable
+import requests
+import json
+import time
+
+
 
 risk_registry = pd.read_csv("data/risk_registry.csv", encoding="utf-8-sig")
 candidate_list = pd.read_csv(
@@ -60,7 +67,7 @@ cosewic_population_filled = (
 
 risk_registry["Unique_ID"] = (
     risk_registry["Scientific name"]
-    + "-"
+    + " - "
     + risk_registry["COSEWIC common name"].fillna(" <blank> ")
     + " ("
     + cosewic_population_filled
@@ -122,7 +129,7 @@ status_report["Common name"] = status_report["Common name"].str.replace(
 
 # Create Unique_ID column.
 status_report["Unique_ID"] = (
-    status_report["Scientific name"] + "-" + status_report["Common name"]
+    status_report["Scientific name"] + " - " + status_report["Common name"]
 )
 
 # Pull out Population from 'Common name' column, save to new column.
@@ -192,12 +199,27 @@ status_report['Scheduled Assessment'] = status_report['Group'].apply(airfuncs.ex
 
 #Merge the tables here
 #%%
+
+col_order_merged = ["Unique_ID",
+                    "Domain", "Taxonomic group",
+                    "Scientific name", "COSEWIC common name",
+                    "COSEWIC population", "COSEWIC status",
+                    "COSEWIC last assessment date", "Estimated re-assessment",
+                    "Scheduled Assessment"]
+
+
+risk_registry_id = set(risk_registry['Unique_ID'])
+status_report = status_report[~status_report["Unique_ID"].isin(risk_registry_id)]
+
 merged_risk_status = pd.merge(risk_registry, status_report[["Unique_ID","Domain", "Taxonomic group", "Scientific name", "COSEWIC common name",
                                                            "COSEWIC population", "COSEWIC status",
                                                            "Scheduled Assessment"]], on="Unique_ID", how = "outer")
 #This function will take the newly merged table and retain anything that is in risk registry but also in status_reports.
 # If the field is empty in risk registry, then it will use what is in status_report. Then the column names are fixed, to remove the x and y 
 airfuncs.prioritize_x_column(merged_risk_status)
+
+merged_risk_status = merged_risk_status[col_order_merged]
+
 
 # %%
 """ fileToAdd = fileToAdd[
@@ -293,7 +315,12 @@ candidate_list = candidate_list[cols_candidate_first]
 # %%
 # merging the two tables
 
+species_tbl_unique = set(species_tbl['Unique_ID'])
+candidate_list = candidate_list[~candidate_list["Unique_ID"].isin(species_tbl_unique)]
+
 merged_spp_candidate = species_tbl.merge(candidate_list, on = 'Unique_ID', how = 'outer')
+
+
 airfuncs.prioritize_x_column(merged_spp_candidate)
 
 cols_merged_order = [
@@ -327,17 +354,19 @@ df= pd.DataFrame(spp_candidate_colnames)
 df = df.transpose()
 df.to_csv("output/col_names/spp_candidate_colnames.csv", index = False, header=False)
 
+merged_risk_status = merged_risk_status.fillna("")
+
+merged_risk_status['Estimated re-assessment'] = merged_risk_status['Estimated re-assessment'].fillna(" ")
+#merged_risk_status['Estimated re-assessment'] = merged_risk_status['Estimated re-assessment'].replace(pd.Timestamp('1900-01-01'), " ")
+
+merged_spp_candidate = merged_spp_candidate.fillna("")
+
 
 
 # %%
 # upload to airtable
 
 
-from pyairtable import Api
-from airtable import Airtable
-import requests
-import json
-import time
 
 with open("login/airtable_key.txt") as f:
     lines = f.readlines()
@@ -349,7 +378,7 @@ with open("login/airtable_key.txt") as f:
 #fileToAdd = pd.read_csv("data/cosewic_spp_specialist_candidate_list.csv", encoding='ISO-8859-1')  
 
 base_id = 'applZn1P0abVQM8NC' # the base of the workspace - change as appropriate 
-table_id = 'tblK4nGIIWOKml7l7' # Risk registry
+table_id = 'tblPDiZ80zCvQrIUD' # Risk registry
 
 # Define the API endpoint and headers
 url = f"https://api.airtable.com/v0/{base_id}/{table_id}"
@@ -378,5 +407,42 @@ for index, row in merged_risk_status.iterrows():
     if response.status_code != 200:
       print(f"Error uploading row {index}: {response.json()}")
 
-    time.sleep(0.2)  # Add a delay between requests (optional)   
+    time.sleep(0.2)  # Add a delay between requests 
+
+
+
+######################
+# Next Table
+######################
+
+table_id = 'tblESIlv9ie05ab7z' # Risk registry
+
+
+url = f"https://api.airtable.com/v0/{base_id}/{table_id}"
+headers = {
+    "Authorization": f"Bearer {token}",
+    "Content-Type": "application/json"
+}
+
+# Get the current records uploaded to Airtable
+current_records = airfuncs.fetch_records(url, headers, base_id, table_id)
+# Delete all records from the current Airtable page
+if current_records:            
+    airfuncs.delete_records(url, base_id, table_id, headers, current_records)
+    
+# convert all types of file to string - this should be changed later to be appropriate types
+merged_spp_candidate = merged_spp_candidate.astype(str) 
+
+#upload the new file
+for index, row in merged_spp_candidate.iterrows():
+    data = {"fields": row.to_dict()}
+
+    
+    print(data)
+    response = requests.post(url, headers=headers, data=json.dumps(data))
+
+    if response.status_code != 200:
+      print(f"Error uploading row {index}: {response.json()}")
+
+    time.sleep(0.2)  # Add a delay between requests
 # %%
