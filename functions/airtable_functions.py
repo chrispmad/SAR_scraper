@@ -190,3 +190,84 @@ def prioritize_x_column(df):
             # drop the names ending in _x or _y
     df.drop(df.filter(regex='_x|_y').columns, axis=1, inplace=True)
     
+    
+def cList_Domain_col(row):
+    group = row['Group'].lower()
+    common_name = row["Common name"].lower()
+
+    if group == "molluscs":
+        if any(
+            name in common_name
+            for name in [
+                "abalone",
+                "oyster",
+                "mussel",
+                "lanx",
+                "capshell",
+                "hot springs snail",
+            ]
+        ):
+            return "Aquatic"
+        else:
+            return "Terrestrial"
+    elif any(
+        grp in group
+        for grp in ["amphibians", "arthropods", "birds", "lichens", "mosses",
+                     "reptiles", "terrestrial mammals", "vascular plants"]
+    ):
+        return "Terrestrial"
+    elif any(
+        grp in group
+        for grp in ["freshwater fishes", "marine fishes", "marine mammals"]
+    ):
+        return "Aquatic"
+    else:
+        return ""
+
+        
+        
+def determine_domain_general(row):
+    taxonomic_group = row["Taxonomic group"]
+    common_name = row["Common name"]
+
+    if taxonomic_group.lower() == "molluscs":
+        if any(
+            name.lower() in common_name.lower()
+            for name in [
+                "abalone",
+                "oyster",
+                "mussel",
+                "lanx",
+                "capshell",
+                "hot springs snail",
+            ]
+        ):
+            return "Aquatic"
+        else:
+            return "Terrestrial"
+    elif any(
+        group.lower() in taxonomic_group.lower()
+        for group in ["fishes (freshwater)", "fishes (marine)", "mammals (marine)",
+                      "Marine fishes"]
+    ):
+        return "Aquatic"
+    elif any(
+        group.lower() in taxonomic_group.lower()
+        for group in [
+            "amphibians",
+            "arthropods",
+            "birds",
+            "lichens",
+            "mammals (terrestrial)",
+            "mosses",
+            "reptiles",
+            "vascular plants",
+            "Terrestrial mammals"
+        ]
+    ):
+        return "Terrestrial"
+    else:
+        return ""     
+    
+    
+    
