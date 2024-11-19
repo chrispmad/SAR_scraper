@@ -4,6 +4,7 @@ import functions.airtable_functions as airfuncs
 import re  # Regular expressions!
 import numpy as np
 import datetime
+import csv
 
 risk_registry = pd.read_csv("data/risk_registry.csv", encoding="utf-8-sig")
 candidate_list = pd.read_csv(
@@ -111,14 +112,6 @@ risk_registry = risk_registry[
 ]
 
 
-
-
-
-
-
-
-
-
 #%%
 ### COSEWIC Status reports
 
@@ -199,12 +192,12 @@ status_report['Scheduled Assessment'] = status_report['Group'].apply(airfuncs.ex
 
 #Merge the tables here
 #%%
-risk_status_merged = pd.merge(risk_registry, status_report[["Unique_ID","Domain", "Taxonomic group", "Scientific name", "COSEWIC common name",
+merged_risk_status = pd.merge(risk_registry, status_report[["Unique_ID","Domain", "Taxonomic group", "Scientific name", "COSEWIC common name",
                                                            "COSEWIC population", "COSEWIC status",
                                                            "Scheduled Assessment"]], on="Unique_ID", how = "outer")
 #This function will take the newly merged table and retain anything that is in risk registry but also in status_reports.
 # If the field is empty in risk registry, then it will use what is in status_report. Then the column names are fixed, to remove the x and y 
-airfuncs.prioritize_x_column(risk_status_merged)
+airfuncs.prioritize_x_column(merged_risk_status)
 
 # %%
 """ fileToAdd = fileToAdd[
@@ -214,4 +207,176 @@ airfuncs.prioritize_x_column(risk_status_merged)
 ] """
 
 
+#%%
+# This is part 2 COSEWIC candidate list table
+species_tbl["Unique_ID"] = species_tbl.apply(lambda row: f"{row['Scientific name']} - {row['Common name'] or '<blank>'}", axis = 1)
+species_tbl["Domain"] = species_tbl.apply(airfuncs.determine_domain_general, axis=1)
+
+
+# Clean up values in Taxonomic group column
+species_tbl["Taxonomic group"] = species_tbl["Taxonomic group"].str.replace(
+    "Freshwater fishes", "Fishes (freshwater)"
+)
+species_tbl["Taxonomic group"] = species_tbl["Taxonomic group"].str.replace(
+    "Marine fishes", "Fishes (marine)"
+)
+species_tbl["Taxonomic group"] = species_tbl["Taxonomic group"].str.replace(
+    "Marine mammals", "Mammals (marine)"
+)
+species_tbl["Taxonomic group"] = species_tbl["Taxonomic group"].str.replace(
+    "Terrestrial mammals", "Mammals (terrestrial)"
+)
+
+species_tbl["COSEWIC common name"] = species_tbl["Common name"]
+
+species_tbl["Candidate list"] = "COSEWIC"
+
+species_tbl["Priority"] = "COSEWIC - Group 1"
+
+#Take the first 4 characters from the Category and assign them as "Date_nominated"
+species_tbl = species_tbl.assign(Date_nominated=species_tbl["Category"].str[:4])
+
+
+# Reorganize columns!
+cols_sp_first = [
+    "Unique_ID",
+    "Domain",
+    "Taxonomic group",
+    "Scientific name",
+    "COSEWIC common name",
+    "Candidate list",
+    "Priority",
+    "Date_nominated",
+    "Rationale",
+]
+
+species_tbl = species_tbl[cols_sp_first]
+
+# %%
+# working on the candidate table
+candidate_list["Unique_ID"] = candidate_list.apply(lambda row: f"{row['Scientific name']} - {row['Common name'] or '<blank>'}", axis = 1) 
+candidate_list["Domain"] = candidate_list.apply(airfuncs.cList_Domain_col, axis = 1)
+
+
+# Clean up values in Taxonomic group column
+candidate_list["Taxonomic group"] = candidate_list["Group"].str.replace(
+    "Freshwater Fishes", "Fishes (freshwater)"
+)
+candidate_list["Taxonomic group"] = candidate_list["Group"].str.replace(
+    "Marine Fishes", "Fishes (marine)"
+)
+candidate_list["Taxonomic group"] = candidate_list["Group"].str.replace(
+    "Marine Mammals", "Mammals (marine)"
+)
+candidate_list["Taxonomic group"] = candidate_list["Group"].str.replace(
+    "Terrestrial Mammals", "Mammals (terrestrial)"
+)
+
+candidate_list["COSEWIC common name"] = candidate_list["Common name"]
+
+candidate_list["Candidate list"] = "SSC"
+
+candidate_list["Priority"] = "SSC - " + candidate_list["Priority"].str[:7]
+
+cols_candidate_first = [
+    "Unique_ID",
+    "Domain",
+    "Taxonomic group",
+    "Scientific name",
+    "COSEWIC common name",
+    "Candidate list",
+    "Priority"
+]
+
+candidate_list = candidate_list[cols_candidate_first]
+
+# %%
+# merging the two tables
+
+merged_spp_candidate = species_tbl.merge(candidate_list, on = 'Unique_ID', how = 'outer')
+airfuncs.prioritize_x_column(merged_spp_candidate)
+
+cols_merged_order = [
+    "Unique_ID",
+    "Domain",
+    "Taxonomic group",
+    "Scientific name",
+    "COSEWIC common name",
+    "Candidate list",
+    "Priority",
+    "Date_nominated",
+    "Rationale",
+    
+]
+
+merged_spp_candidate = merged_spp_candidate[cols_merged_order]
+
+# %%
+
+merged_risk_status.to_csv("output/risk_status_merged.csv", index=False)
+merged_spp_candidate.to_csv("output/merged_spp_candidate.csv", index=False)
+risk_status_colnames = list(merged_risk_status.columns)
+spp_candidate_colnames = list(merged_spp_candidate.columns)
+
+# save column names to create the tables in airtable
+df= pd.DataFrame(risk_status_colnames)
+df = df.transpose()
+df.to_csv("output/col_names/risk_status_colnames.csv", index = False, header=False)
+
+df= pd.DataFrame(spp_candidate_colnames)
+df = df.transpose()
+df.to_csv("output/col_names/spp_candidate_colnames.csv", index = False, header=False)
+
+
+
+# %%
+# upload to airtable
+
+
+from pyairtable import Api
+from airtable import Airtable
+import requests
+import json
+import time
+
+with open("login/airtable_key.txt") as f:
+    lines = f.readlines()
+    username = lines[0].strip()
+    token = lines[1].strip()
+    print(f"USERNAME = {username}")
+
+#fileToAdd = pd.read_csv("data/risk_registry.csv", encoding='utf-8-sig')      
+#fileToAdd = pd.read_csv("data/cosewic_spp_specialist_candidate_list.csv", encoding='ISO-8859-1')  
+
+base_id = 'applZn1P0abVQM8NC' # the base of the workspace - change as appropriate 
+table_id = 'tblK4nGIIWOKml7l7' # Risk registry
+
+# Define the API endpoint and headers
+url = f"https://api.airtable.com/v0/{base_id}/{table_id}"
+headers = {
+    "Authorization": f"Bearer {token}",
+    "Content-Type": "application/json"
+}
+
+# Get the current records uploaded to Airtable
+current_records = airfuncs.fetch_records(url, headers, base_id, table_id)
+# Delete all records from the current Airtable page
+if current_records:            
+    airfuncs.delete_records(url, base_id, table_id, headers, current_records)
+    
+# convert all types of file to string - this should be changed later to be appropriate types
+merged_risk_status = merged_risk_status.astype(str) 
+
+#upload the new file
+for index, row in merged_risk_status.iterrows():
+    data = {"fields": row.to_dict()}
+
+    
+    print(data)
+    response = requests.post(url, headers=headers, data=json.dumps(data))
+
+    if response.status_code != 200:
+      print(f"Error uploading row {index}: {response.json()}")
+
+    time.sleep(0.2)  # Add a delay between requests (optional)   
 # %%
