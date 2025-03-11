@@ -12,6 +12,7 @@ import pandas as pd
 import time
 import csv
 import re
+from datetime import date
 
 # Initialize WebDriver (ensure 'chromedriver' is in your PATH)
 driver = webdriver.Chrome()
@@ -24,16 +25,30 @@ driver.get(
 # Wait for the page to load fully
 time.sleep(10)
 
-# %%
+# %% 
+
 
 # Store the extracted data
 data = []
 
 # Find all <h3> elements (category headers)
-h3_elements = driver.find_elements(By.TAG_NAME, "h3")
+#h3_elements = driver.find_elements(By.TAG_NAME, "h3")
+
+
 
 # Regular expression to match category labels like "2020 (7)"
 category_pattern = r"[0-9]{4} \([0-9]+\)"
+
+h3_elements = []
+for the_year in range(2019,2030):
+    try: 
+        the_element = driver.find_element(By.CSS_SELECTOR,f"[href='#Y{the_year}']")
+    except:
+        the_element = None
+    if the_element:
+        print(" We found that year!")
+        h3_elements.append(the_element)
+#h3_elements = driver.find_element(By.CSS_SELECTOR,"[href='#Y2019']")
 
 for h3 in h3_elements:
     # Extract the section name from the <h3> element
@@ -45,9 +60,9 @@ for h3 in h3_elements:
 
         # Try to expand the section by clicking the <a> child element
         try:
-            child_div = h3.find_element(By.TAG_NAME, "a")
-            if child_div.get_attribute("class") == "text-info":
-                ActionChains(driver).move_to_element(child_div).click().perform()
+            #child_div = h3.find_element(By.TAG_NAME, "a")
+            if h3.get_attribute("class") == "text-success":
+                ActionChains(driver).move_to_element(h3).click().perform()
                 time.sleep(2)  # Small delay to allow content to load
         except Exception as e:
             print(f"No clickable div found for section: {section_name}. Error: {e}")
@@ -94,8 +109,9 @@ df = pd.DataFrame(data)
 print(df)
 
 # %%
+todays_date = date.today().strftime('%Y-%m-%d')
+df.to_csv("data/candidate_species_tbl"+todays_date+".csv")
 df.to_csv("data/candidate_species_tbl.csv")
-
     
 #%%
 table_xpath = "//*[@id='ca-1529739248826']/main/div/div[2]/table"
@@ -182,14 +198,46 @@ for sublist in table_data:
     ]
     csv_data.append(row)
 #header names for the csv file
-header = ['Group', 'Priority', 'Common name', 'Scientific name', 'Location']
 
-with open('data/cosewic_spp_specialist_candidate_list.csv', 'w', newline='') as file:
-    writer = csv.writer(file)
-    writer.writerow(header)
-    writer.writerows(csv_data)
+# Convert list to DataFrame
+df = pd.DataFrame(csv_data, columns=["col1", "group", "species", "scientific_name", "regions"])
+# Identify rows that define a new category (category name is in column 2, others are NaN)
+df["category"] = df["species"].where(df["scientific_name"].isna())  # Extract categories
+df["category"] = df["category"].fillna(method="ffill")  # Forward-fill category to other rows
+df = df.drop(columns=["col1"])
+
+# Remove category-defining rows (rows where scientific_name is NaN)
+df = df.dropna(subset=["scientific_name"])
+
+df = df.rename(columns={"species": "Common name", "scientific_name": "Scientific name", "regions": "Location", "category": "Group"})
+
+df["Group"] = df["Group"].str.replace(r"\s*\(.*?\)", "", regex=True)
+
+header = ['Group', 'Priority', 'Common name', 'Scientific name', 'Location',]
+
+# with open('data/cosewic_spp_specialist_candidate_list.csv', 'w', newline='') as file:
+#     writer = csv.writer(file)
+#     writer.writerow(header)
+#     writer.writerows(csv_data)
+    
+# with open('data/cosewic_spp_specialist_candidate_list'+todays_date+'.csv', 'w', newline='') as file:
+#     writer = csv.writer(file)
+#     writer.writerow(header)
+#     writer.writerows(csv_data)
+
+
+
 
 # %%
+# Define the file path
+file_path = "data/cosewic_spp_specialist_candidate_list.csv"
+dated_file_path = f"data/cosewic_spp_specialist_candidate_list{todays_date}.csv"
+
+# Save the DataFrame to CSV
+df.to_csv(file_path, index=False)  # No index column
+df.to_csv(dated_file_path, index=False)  # Save with today's date
 
 # Close the browser
 driver.quit()
+
+# %%

@@ -13,6 +13,7 @@ import time
 import os
 import glob
 import shutil
+from datetime import date
 
 url = "https://species-registry.canada.ca/index-en.html#/species?sortBy=commonNameSort&sortDirection=asc&pageSize=100"
 
@@ -41,6 +42,8 @@ file_pattern = "SAR Species - [0-9]+ results.csv"
 all_downloads_in_folder = os.listdir(downloads_folder)
 matching_file = [f for f in all_downloads_in_folder if re.search(file_pattern, f)]
 
+
+todays_date = date.today().strftime('%Y-%m-%d')
 if matching_file:
     downloaded_file = matching_file[0]
 
@@ -49,6 +52,12 @@ if matching_file:
         os.path.join(downloads_folder, downloaded_file),
         current_data_folder + "\\risk_registry.csv",
     )
+    
+    # Copy file to data folder
+    shutil.copyfile(
+        os.path.join(downloads_folder, downloaded_file),
+        current_data_folder + "\\risk_registry"+todays_date+".csv",
+    )
 
     # Delete file in downloads folder
     os.remove(os.path.join(downloads_folder, downloaded_file))
@@ -56,3 +65,5 @@ else:
     print("No files found matching the pattern.")
 
 driver.quit()
+
+# %%

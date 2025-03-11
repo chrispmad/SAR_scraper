@@ -1,4 +1,4 @@
-﻿COSEWIC common name,COSEWIC population,COSEWIC status,COSEWIC last assessment date,Scientific name,Legal common name,Legal population,Schedule status,Last status change,SARA schedule,Date added,Range,Taxonomic group,Under consideration for,GIC decision
+﻿COSEWIC common name,COSEWIC population,COSEWIC status,COSEWIC last assessment date,Scientific name,Legal common name,Legal population,Schedule 1 status,Last status change,SARA schedule,Date added,Range,Taxonomic group,Under consideration for,GIC decision
 Acadian Flycatcher,,Endangered,2010-04-25,Empidonax virescens,Acadian Flycatcher,,Endangered,2003-06-05,Schedule 1,2003-06-05,Ontario,Birds,,Added to list
 Acadian Redfish,Atlantic population,Threatened,2010-04-25,Sebastes fasciatus,Acadian Redfish,Atlantic population,No Status,,No schedule,,Atlantic Ocean,Fishes (marine),Addition,Pending
 Acadian Redfish,Bonne Bay population,Special Concern,2010-04-25,Sebastes fasciatus,Acadian Redfish,Bonne Bay population,No Status,,No schedule,,Atlantic Ocean,Fishes (marine),Addition,Pending
@@ -136,7 +136,7 @@ Black Tern,,Not at Risk,1996-04-01,Chlidonias niger,,,No Status,,No schedule,,"A
 Black-foam Lichen,,Threatened,2015-05-01,Anzia colpodes,Black-foam Lichen,,Threatened,2019-02-25,Schedule 1,2019-02-25,"New Brunswick, Nova Scotia, Ontario, Quebec",Lichens,,Added to list
 Black-footed Albatross,,Special Concern,2007-04-22,Phoebastria nigripes,Black-footed Albatross,,Special Concern,2009-03-05,Schedule 1,2009-03-05,Pacific Ocean,Birds,,Added to list
 Black-footed Ferret,,Extirpated,2021-12-01,Mustela nigripes,Black-footed Ferret,,Extirpated,2003-06-05,Schedule 1,2003-06-05,"Alberta, Saskatchewan",Mammals (terrestrial),,Added to list
-Black-tailed Prairie Dog,,Threatened,2011-11-25,Cynomys ludovicianus,Black-tailed Prairie Dog,,Threatened,2018-02-02,Schedule 1,2003-06-05,Saskatchewan,Mammals (terrestrial),,Uplisted: Special Concern to threatened
+Black-tailed Prairie Dog,,Threatened,2024-11-28,Cynomys ludovicianus,Black-tailed Prairie Dog,,Threatened,2018-02-02,Schedule 1,2003-06-05,Saskatchewan,Mammals (terrestrial),,Uplisted: Special Concern to threatened
 Blackchin Shiner,,Not at Risk,1994-04-01,Notropis heterodon,,,No Status,,No schedule,,"Manitoba, Ontario, Quebec",Fishes (freshwater),,
 Blackfin Cisco,,Data Deficient,2007-04-22,Coregonus nigripinnis,Blackfin Cisco,,,,,,Ontario,Fishes (freshwater),,
 Blackline Prickleback,,Data Deficient,2003-05-01,Acantholumpenus mackayi,Blackline Prickleback,,,,,,Arctic Ocean,Fishes (marine),,
@@ -199,7 +199,7 @@ Bull Trout,Upper Yukon Watershed populations,Data Deficient,2012-11-25,Salvelinu
 Bull Trout,Western Arctic populations,Special Concern,2012-11-25,Salvelinus confluentus,Bull Trout,Western Arctic populations,Special Concern,2019-08-08,Schedule 1,2019-08-08,"Alberta, British Columbia, Northwest Territories, Yukon",Fishes (freshwater),,Added to list
 Bullsnake,,Special Concern,2017-04-28,Pituophis catenifer sayi,Bullsnake,,Special Concern,2021-08-12,Schedule 1,2021-08-12,"Alberta, Saskatchewan",Reptiles,,Added to list
 Burrowing Owl,,Endangered,2017-04-28,Athene cunicularia,Burrowing Owl,,Endangered,2003-06-05,Schedule 1,2003-06-05,"Alberta, British Columbia, Manitoba, Saskatchewan",Birds,,Added to list
-Butler's Gartersnake,,Endangered,2010-11-26,Thamnophis butleri,Butler's Gartersnake,,Endangered,2017-06-02,Schedule 1,2003-06-05,Ontario,Reptiles,,Uplisted: Threatened to endangered
+Butler's Gartersnake,,Threatened,2024-11-28,Thamnophis butleri,Butler's Gartersnake,,Endangered,,Schedule 1,2003-06-05,Ontario,Reptiles,Status change,Pending
 Butternut,,Endangered,2017-04-28,Juglans cinerea,Butternut,,Endangered,2005-07-14,Schedule 1,2005-07-14,"New Brunswick, Ontario, Quebec",Vascular Plants,,Added to list
 California Buttercup,,Endangered,2008-11-28,Ranunculus californicus,California Buttercup,,Endangered,2011-02-04,Schedule 1,2011-02-04,British Columbia,Vascular Plants,,Added to list
 California Sea Lion,,Not at Risk,1987-04-01,Zalophus californianus,,,No Status,,No schedule,,"British Columbia, Pacific Ocean",Mammals (marine),,
@@ -268,6 +268,7 @@ Chinook Salmon,"West Vancouver Island, Ocean, Fall (Nootka & Kyuquot) population
 Chinook Salmon,"West Vancouver Island, Ocean, Fall (South) population",Threatened,2020-11-04,Oncorhynchus tshawytscha,Chinook Salmon,"West Vancouver Island, Ocean, Fall (South) population",No Status,,No schedule,,"British Columbia, Pacific Ocean",Fishes (marine),Addition,Pending
 Chinook Salmon,"West Vancouver Island, Ocean, Fall (WVI + WQCI) population",Data Deficient,2020-11-04,Oncorhynchus tshawytscha,,,No Status,,No schedule,,"British Columbia, Pacific Ocean",Fishes (marine),,
 Chiselmouth,,Not at Risk,2003-05-01,Acrocheilus alutaceus,,,No Status,,No schedule,,British Columbia,Fishes (freshwater),,
+Circular-leaved Peat Moss,,Endangered,2024-11-28,Sphagnum cyclophyllum,Circular-leaved Peat Moss,,No Status,,No schedule,,Nova Scotia,Mosses,Addition,Pending
 Cleland’s Evening-primrose,,Endangered,2023-12-01,Oenothera clelandii,Cleland’s Evening-primrose,,No Status,,No schedule,,Ontario,Vascular Plants,Addition,Pending
 Cliff Paintbrush,,Threatened,2005-05-05,Castilleja rupicola,Cliff Paintbrush,,Threatened,2006-08-15,Schedule 1,2006-08-15,British Columbia,Vascular Plants,,Added to list
 Climbing Prairie Rose,,Special Concern,2003-05-01,Rosa setigera,Climbing Prairie Rose,,Special Concern,2005-01-12,Schedule 1,2005-01-12,Ontario,Vascular Plants,,Added to list
@@ -480,8 +481,6 @@ Gray Ratsnake,,Non-active,2007-04-22,Pantherophis spiloides,Gray Ratsnake,,No St
 Gray Ratsnake,Carolinian population,Endangered,2018-04-27,Pantherophis spiloides,Gray Ratsnake,Carolinian population,Endangered,2009-03-05,Schedule 1,2003-06-05,Ontario,Reptiles,,Uplisted
 Gray Ratsnake,Great Lakes / St. Lawrence population,Threatened,2018-04-27,Pantherophis spiloides,Gray Ratsnake,Great Lakes / St. Lawrence population,Threatened,,Schedule 1,2003-06-05,Ontario,Reptiles,,
 Gray's Desert-parsley,,Threatened,2008-11-28,Lomatium grayi,Gray's Desert-parsley,,Threatened,2011-02-04,Schedule 1,2011-02-04,British Columbia,Vascular Plants,,Added to list
-Gray-cheeked Thrush minimus subspecies,,Threatened,2023-12-01,Catharus minimus minimus,Gray-cheeked Thrush minimus subspecies,,No Status,,No schedule,,"Newfoundland and Labrador, Nova Scotia, Quebec",Birds,Addition,Pending
-Gray-headed Chickadee,,Endangered,2024-05-09,Poecile cinctus,Gray-headed Chickadee,,No Status,,No schedule,,"Northwest Territories, Yukon",Birds,Addition,Pending
 Great Auk,,Extinct,2000-05-01,Pinguinus impennis,,,No Status,,No schedule,,"New Brunswick, Newfoundland and Labrador, Nova Scotia, Quebec",Birds,,
 Great Basin Gophersnake,,Threatened,2013-05-03,Pituophis catenifer deserticola,Great Basin Gophersnake,,Threatened,2005-01-12,Schedule 1,2005-01-12,British Columbia,Reptiles,,Added to list
 Great Basin Spadefoot,,Threatened,2019-11-29,Spea intermontana,Great Basin Spadefoot,,Threatened,2003-06-05,Schedule 1,2003-06-05,British Columbia,Amphibians,,Added to list
@@ -506,6 +505,8 @@ Grey Whale,Eastern North Pacific population,Non-active,2017-11-01,Eschrichtius r
 Grey Whale,Northern Pacific Migratory population,Not at Risk,2017-11-01,Eschrichtius robustus,,,No Status,,No schedule,,"Arctic Ocean, British Columbia, Northwest Territories, Pacific Ocean, Yukon",Mammals (marine),,
 Grey Whale,Pacific Coast Feeding Group population,Endangered,2017-11-01,Eschrichtius robustus,Grey Whale,Pacific Coast Feeding Group population,No Status,,No schedule,,"British Columbia, Pacific Ocean",Mammals (marine),Addition,Pending
 Grey Whale,Western Pacific population,Endangered,2017-11-01,Eschrichtius robustus,Grey Whale,Western Pacific population,No Status,,No schedule,,"British Columbia, Pacific Ocean",Mammals (marine),Addition,Pending
+Gray-cheeked Thrush minimus subspecies,,Threatened,2023-12-01,Catharus minimus minimus,Grey-cheeked Thrush minimus subspecies,,No Status,,No schedule,,"Newfoundland and Labrador, Nova Scotia, Quebec",Birds,Addition,Pending
+Gray-headed Chickadee,,Endangered,2024-05-09,Poecile cinctus,Grey-headed Chickadee,,No Status,,No schedule,,"Northwest Territories, Yukon",Birds,Addition,Pending
 Griscom’s Arnica,,Threatened,2014-11-28,Arnica griscomii ssp. griscomii,Griscom’s Arnica,,Threatened,2019-02-25,Schedule 1,2019-02-25,"Newfoundland and Labrador, Quebec",Vascular Plants,,Added to list
 Grizzly Bear,,Non-active,1991-04-01,Ursus arctos,,,No Status,,No schedule,,"Alberta, British Columbia, Northwest Territories, Nunavut, Yukon",Mammals (terrestrial),,
 Grizzly Bear,Northwestern population,Non-active,2012-05-04,Ursus arctos,Grizzly Bear,Northwestern population,No Status,2005-01-12,No schedule,,"Alberta, British Columbia, Northwest Territories, Nunavut, Yukon",Mammals (terrestrial),,Decision deferred further consultations required
@@ -619,7 +620,7 @@ Large-headed Woolly Yarrow,,Special Concern,2018-04-27,Achillea millefolium var.
 Lark Bunting,,Threatened,2017-04-28,Calamospiza melanocorys,Lark Bunting,,Threatened,2019-05-22,Schedule 1,2019-05-22,"Alberta, Manitoba, Saskatchewan",Birds,,Added to list
 Laura's Clubtail,,Endangered,2010-04-25,Stylurus laurae,Laura's Clubtail,,No Status,2012-07-04,No schedule,,Ontario,Arthropods,,Not to list
 Leach’s Storm-Petrel,Atlantic population,Threatened,2020-11-04,Oceanodroma leucorhoa,Leach’s Storm-Petrel,Atlantic population,No Status,,No schedule,,"Atlantic Ocean, New Brunswick, Newfoundland and Labrador, Nova Scotia, Prince Edward Island, Quebec",Birds,Addition,Pending
-Least Bittern,,Threatened,2009-04-26,Ixobrychus exilis,Least Bittern,,Threatened,2003-06-05,Schedule 1,2003-06-05,"Manitoba, New Brunswick, Nova Scotia, Ontario, Quebec",Birds,,Added to list
+Least Bittern,,Special Concern,2024-11-28,Ixobrychus exilis,Least Bittern,,Threatened,,Schedule 1,2003-06-05,"Manitoba, New Brunswick, Nova Scotia, Ontario, Prince Edward Island, Quebec, Saskatchewan",Birds,Status change,Pending
 Least Darter,,Not at Risk,1989-04-01,Etheostoma microperca,,,No Status,,No schedule,,Ontario,Fishes (freshwater),,
 Leatherback Sea Turtle,,Non-active,2012-05-04,Dermochelys coriacea,Leatherback Sea Turtle,,No Status,2017-04-13,No schedule,2003-06-05,"Atlantic Ocean, Pacific Ocean",Reptiles,,Struck - WS reassignment
 Leatherback Sea Turtle,Atlantic population,Endangered,2022-12-03,Dermochelys coriacea,Leatherback Sea Turtle,Atlantic population,Endangered,,Schedule 1,2003-06-05,"Atlantic Ocean, New Brunswick, Newfoundland and Labrador, Nova Scotia, Prince Edward Island, Quebec",Reptiles,,
@@ -628,8 +629,8 @@ Leiberg's Fleabane,,Data Deficient,2016-11-27,Erigeron leibergii,,,No Status,,No
 Lemmon's Holly Fern,,Threatened,2003-05-01,Polystichum lemmonii,Lemmon's Holly Fern,,Threatened,2005-01-12,Schedule 1,2005-01-12,British Columbia,Vascular Plants,,Added to list
 Leopard Dace,,Not at Risk,1990-04-01,Rhinichthys falcatus,,,No Status,,No schedule,,British Columbia,Fishes (freshwater),,
 Lesser Yellowlegs,,Threatened,2020-11-04,Tringa flavipes,Lesser Yellowlegs,,No Status,,No schedule,,"Alberta, British Columbia, Manitoba, New Brunswick, Newfoundland and Labrador, Northwest Territories, Nova Scotia, Nunavut, Ontario, Prince Edward Island, Quebec, Saskatchewan, Yukon",Birds,Addition,Pending
-Lewis's Woodpecker,,Threatened,2010-04-25,Melanerpes lewis,Lewis's Woodpecker,,Threatened,2012-06-20,Schedule 1,2003-06-05,British Columbia,Birds,,Uplisted: Special Concern to threatened
-Lilliput,,Endangered,2013-05-03,Toxolasma parvum,Lilliput,,Endangered,2019-08-08,Schedule 1,2019-08-08,Ontario,Molluscs,,Added to list
+Lewis's Woodpecker,,Threatened,2024-11-28,Melanerpes lewis,Lewis's Woodpecker,,Threatened,2012-06-20,Schedule 1,2003-06-05,"Alberta, British Columbia",Birds,,Uplisted: Special Concern to threatened
+Lilliput,,Special Concern,2024-11-28,Toxolasma parvum,Lilliput,,Endangered,,Schedule 1,2019-08-08,Ontario,Molluscs,Status change,Pending
 Limber Pine,,Endangered,2014-11-28,Pinus flexilis,Limber Pine,,No Status,,No schedule,,"Alberta, British Columbia",Vascular Plants,Addition,Pending
 Lindley's False Silverpuffs,,Endangered,2008-04-25,Uropappus lindleyi,Lindley's False Silverpuffs,,Endangered,2010-02-23,Schedule 1,2010-02-23,British Columbia,Vascular Plants,,Added to list
 Little Barley,,Data Deficient,1993-04-01,Hordeum pusillum,,,No Status,,No schedule,,Alberta,Vascular Plants,,
@@ -714,8 +715,8 @@ Northern Alligator Lizard,,Not at Risk,2002-05-01,Elgaria coerulea,,,No Status,,
 Northern Barrens Tiger Beetle,,Endangered,2009-11-27,Cicindela patruela,Northern Barrens Tiger Beetle,,Endangered,2012-06-20,Schedule 1,2012-06-20,"Ontario, Quebec",Arthropods,,Added to list
 Northern Bobwhite,,Endangered,2023-05-05,Colinus virginianus,Northern Bobwhite,,Endangered,2005-07-14,Schedule 1,2005-07-14,Ontario,Birds,,Added to list
 Northern Bottlenose Whale,,Non-active,1996-04-01,Hyperoodon ampullatus,,,No Status,,No schedule,,Atlantic Ocean,Mammals (marine),,
-Northern Bottlenose Whale,Davis Strait-Baffin Bay-Labrador Sea population,Special Concern,2011-05-06,Hyperoodon ampullatus,Northern Bottlenose Whale,Davis Strait-Baffin Bay-Labrador Sea population,No Status,,No schedule,,Atlantic Ocean,Mammals (marine),Addition,Pending
-Northern Bottlenose Whale,Scotian Shelf population,Endangered,2011-05-06,Hyperoodon ampullatus,Northern Bottlenose Whale,Scotian Shelf population,Endangered,2006-04-06,Schedule 1,2006-04-06,Atlantic Ocean,Mammals (marine),,Added to list
+Northern Bottlenose Whale,Davis Strait-Baffin Bay-Labrador Sea population,Special Concern,2024-11-28,Hyperoodon ampullatus,Northern Bottlenose Whale,Davis Strait-Baffin Bay-Labrador Sea population,No Status,,No schedule,,"Atlantic Ocean, Newfoundland and Labrador, Nunavut",Mammals (marine),Addition,Pending
+Northern Bottlenose Whale,Scotian Shelf population,Endangered,2024-11-28,Hyperoodon ampullatus,Northern Bottlenose Whale,Scotian Shelf population,Endangered,2006-04-06,Schedule 1,2006-04-06,"Atlantic Ocean, Newfoundland and Labrador, Nova Scotia",Mammals (marine),,Added to list
 Northern Brook Lamprey,,Non-active,2007-04-22,Ichthyomyzon fossor,Northern Brook Lamprey,,,,,,"Manitoba, Ontario, Quebec",Fishes (freshwater),,
 Northern Brook Lamprey,Great Lakes - Upper St. Lawrence populations,Special Concern,2020-11-04,Ichthyomyzon fossor,Northern Brook Lamprey,Great Lakes - Upper St. Lawrence populations,Special Concern,2009-03-05,Schedule 1,2009-03-05,"Ontario, Quebec",Fishes (freshwater),,Added to list
 Northern Brook Lamprey,Saskatchewan - Nelson River populations,Endangered,2020-11-04,Ichthyomyzon fossor,Northern Brook Lamprey,Saskatchewan-Nelson population,,,,,Manitoba,Fishes (freshwater),,
@@ -959,8 +960,11 @@ Sharp-tailed Snake,Pacific Coast population,Threatened,2021-12-01,Contia tenuis,
 Sheathed Slug,,Special Concern,2016-04-29,Zacoleus idahoensis,Sheathed Slug,,Special Concern,2019-02-25,Schedule 1,2019-02-25,British Columbia,Molluscs,,Added to list
 Short's Aster,,Not at Risk,1999-04-01,Symphyotrichum shortii,,,No Status,,No schedule,,Ontario,Vascular Plants,,
 Short-beaked Common Dolphin,,Not at Risk,1991-04-01,Delphinus delphis,,,No Status,,No schedule,,"Atlantic Ocean, Pacific Ocean",Mammals (marine),,
+Short-billed Dowitcher caurinus subspecies,,Endangered,2024-11-28,Limnodromus griseus caurinus,Short-billed Dowitcher caurinus subspecies,,No Status,,No schedule,,"British Columbia, Yukon",Birds,Addition,Pending
+Short-billed Dowitcher hendersoni/griseus,,Threatened,2024-11-28,Limnodromus griseus hendersoni/griseus,Short-billed Dowitcher hendersoni/griseus,,No Status,,No schedule,,"Alberta, Manitoba, New Brunswick, Newfoundland and Labrador, Northwest Territories, Nova Scotia, Ontario, Prince Edward Island, Quebec, Saskatchewan",Birds,Addition,Pending
 Short-eared Owl,,Threatened,2021-05-05,Asio flammeus,Short-eared Owl,,Special Concern,,Schedule 1,2012-06-20,"Alberta, British Columbia, Manitoba, New Brunswick, Newfoundland and Labrador, Northwest Territories, Nova Scotia, Nunavut, Ontario, Prince Edward Island, Quebec, Saskatchewan, Yukon",Birds,Status change,Pending
 Short-finned Pilot Whale,,Not at Risk,1993-04-01,Globicephala macrorhynchus,,,No Status,,No schedule,,Pacific Ocean,Mammals (marine),,
+Short-fruited Rush,,Endangered,2024-11-28,Juncus brachycarpus,Short-fruited Rush,,No Status,,No schedule,,Ontario,Vascular Plants,Addition,Pending
 Short-rayed Alkali Aster,,Endangered,2006-04-29,Symphyotrichum frondosum,Short-rayed Alkali Aster,,Endangered,2007-12-13,Schedule 1,2007-12-13,British Columbia,Vascular Plants,,Added to list
 Short-tailed Albatross,,Threatened,2013-11-01,Phoebastria albatrus,Short-tailed Albatross,,Threatened,2005-07-14,Schedule 1,2005-07-14,"British Columbia, Pacific Ocean",Birds,,Added to list
 Shortface Lanx,,Endangered,2016-04-29,Fisherola nuttallii,Shortface Lanx,,No Status,,No schedule,,British Columbia,Molluscs,Addition,Pending
@@ -1129,6 +1133,7 @@ Unisexual Ambystoma,Jefferson Salamander dependent population,Endangered,2016-04
 Unisexual Ambystoma,Small-mouthed Salamander dependent population,Endangered,2016-04-29,Ambystoma laterale - texanum,Unisexual Ambystoma,Small-mouthed Salamander dependent population,Endangered,2021-08-12,Schedule 1,2021-08-12,Ontario,Amphibians,,Added to list
 Upper Great Lakes Kiyi,,Special Concern,2005-05-05,Coregonus kiyi kiyi,Upper Great Lakes Kiyi,,Special Concern,2007-12-13,Schedule 1,2007-12-13,Ontario,Fishes (freshwater),,Added to list
 Ute Ladies’–tresses,,Endangered,2018-11-01,Spiranthes diluvialis,Ute Ladies’–tresses,,No Status,,No schedule,,British Columbia,Vascular Plants,Addition,Pending
+Valley Grasshopper,,Endangered,2024-11-28,Oedaleonotus enigma,Valley Grasshopper,,No Status,,No schedule,,British Columbia,Arthropods,Addition,Pending
 Van Brunt's Jacob's-ladder,,Threatened,2002-11-01,Polemonium vanbruntiae,Van Brunt's Jacob's-ladder,,Threatened,2005-01-12,Schedule 1,2005-01-12,Quebec,Vascular Plants,,Added to list
 Vananda Creek Benthic Threespine Stickleback,,Endangered,2023-12-01,Gasterosteus aculeatus,Vananda Creek Benthic Threespine Stickleback,,Endangered,2003-06-05,Schedule 1,2003-06-05,British Columbia,Fishes (freshwater),,Added to list
 Vananda Creek Limnetic Threespine Stickleback,,Endangered,2023-12-01,Gasterosteus aculeatus,Vananda Creek Limnetic Threespine Stickleback,,Endangered,2003-06-05,Schedule 1,2003-06-05,British Columbia,Fishes (freshwater),,Added to list

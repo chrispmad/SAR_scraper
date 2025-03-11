@@ -112,6 +112,7 @@ def create_unique_id(df):
 def determine_cosewic_domain(row):
     taxonomic_group = row["Taxonomic group"]
     common_name = row["COSEWIC common name"]
+    
     if taxonomic_group == "Molluscs":
         if any(
             name in common_name
@@ -127,6 +128,8 @@ def determine_cosewic_domain(row):
                 "Mussel",
                 "Lanx",
                 "Capshell",
+                "physa",  
+                "pebblesnail",  
             ]
         ):
             return "Aquatic"
@@ -192,35 +195,25 @@ def prioritize_x_column(df):
     
     
 def cList_Domain_col(row):
-    group = row['Group'].lower()
-    common_name = row["Common name"].lower()
+    group = str(row['Group']).strip().lower() if pd.notna(row['Group']) else ""
+    common_name = str(row["Common name"]).strip().lower() if pd.notna(row["Common name"]) else ""
+
+    aquatic_molluscs = {"abalone", "oyster", "mussel", "lanx", "capshell", 
+                        "hot springs snail", "physa", "pebblesnail"}
+    
+    aquatic_groups = {"fishes (freshwater)", "fishes (marine)", "mammals (marine)", 
+                      "marine fishes", "freshwater fishes", "marine mammals"}
+
+    terrestrial_groups = {"amphibians", "arthropods", "birds", "lichens", 
+                          "mammals (terrestrial)", "mosses", "reptiles", 
+                          "vascular plants", "terrestrial mammals", "terrestrial"}
 
     if group == "molluscs":
-        if any(
-            name in common_name
-            for name in [
-                "abalone",
-                "oyster",
-                "mussel",
-                "lanx",
-                "capshell",
-                "hot springs snail",
-            ]
-        ):
-            return "Aquatic"
-        else:
-            return "Terrestrial"
-    elif any(
-        grp in group
-        for grp in ["amphibians", "arthropods", "birds", "lichens", "mosses",
-                     "reptiles", "terrestrial mammals", "vascular plants"]
-    ):
-        return "Terrestrial"
-    elif any(
-        grp in group
-        for grp in ["freshwater fishes", "marine fishes", "marine mammals"]
-    ):
+        return "Aquatic" if any(name in common_name for name in aquatic_molluscs) else "Terrestrial"
+    elif group in aquatic_groups:
         return "Aquatic"
+    elif group in terrestrial_groups:
+        return "Terrestrial"
     else:
         return ""
 
@@ -240,6 +233,9 @@ def determine_domain_general(row):
                 "lanx",
                 "capshell",
                 "hot springs snail",
+                "physa",  # Lowercase version
+                "pebblesnail",  # Lowercase version
+
             ]
         ):
             return "Aquatic"
@@ -270,4 +266,7 @@ def determine_domain_general(row):
         return ""     
     
     
-    
+def format_str_to_list(value):
+    if pd.isna(value):  # Handle NaN values
+        return []
+    return [item.strip() for item in value.split(",")]  # Convert to list   

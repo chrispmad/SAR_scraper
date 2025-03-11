@@ -6,6 +6,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd
 import time
+from datetime import date
+
+todays_date = date.today().strftime('%Y-%m-%d')
 
 url = "https://www.cosewic.ca/index.php/en/reports/status-reports-preparation.html"
 
@@ -68,7 +71,8 @@ df = df[df["Scientific name"].notna()]
 
 # Write out the scraped dataframe to our data folder.
 df.to_csv("data/cosewic_status_reports_prep.csv")
-
+todays_date = date.today().strftime('%Y-%m-%d')
+df.to_csv("data/cosewic_status_reports_prep"+todays_date+".csv")
 # Close the robotically controlled internet browser.
 driver.quit()
 
