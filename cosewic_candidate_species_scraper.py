@@ -23,7 +23,7 @@ driver.get(
 )
 
 # Wait for the page to load fully
-time.sleep(10)
+time.sleep(5)
 
 # %% 
 
