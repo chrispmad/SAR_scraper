@@ -29,11 +29,12 @@ time.sleep(2)
 
 # %%
 # Click Download Button
-download_button = driver.find_element(By.CLASS_NAME, "sar-export-button")
-
+#download_button = driver.find_element(By.CLASS_NAME, "sar-export-button")
+download_button = driver.find_element(By.XPATH, '//*[@id="page-results"]/div[1]/div[4]/button')
 download_button.click()
 # %%
 # Move downloaded file from Downloads folder to R data folder
+time.sleep(5)
 downloads_folder = os.path.expanduser("~/Downloads")
 current_folder = os.getcwd()
 current_data_folder = os.path.join(current_folder, "data")
@@ -64,6 +65,6 @@ if matching_file:
 else:
     print("No files found matching the pattern.")
 
-driver.quit()
+#driver.quit()
 
 # %%
