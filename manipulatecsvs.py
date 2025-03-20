@@ -1,4 +1,11 @@
 # %%
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException
 import pandas as pd
 import functions.airtable_functions as airfuncs
 import re  # Regular expressions!
@@ -14,6 +21,7 @@ from datetime import date
 from office365.sharepoint.client_context import ClientContext
 from office365.runtime.auth.client_credential import ClientCredential
 from urllib.parse import urlparse, unquote
+import re
 
 #%%
 
@@ -54,6 +62,7 @@ species_tbl = species_tbl[
 
 # Replace any occurrences of 'Populations' in the population field.
 risk_registry["Legal population"] = risk_registry["Legal population"].str.replace(r"\b[Pp]opulations?\b", "population", regex=True)
+risk_registry["COSEWIC population"] = risk_registry["COSEWIC population"].str.replace(r"\b[Pp]opulations?\b", "population", regex=True)
 
 
 
@@ -104,20 +113,72 @@ def merge_rows(group):
 # for where the legal common name is white sturgeon - if the COSEWIC common name is blank, then the COSEWIC common name should be white sturgeon
 risk_registry.loc[(risk_registry["Legal common name"] == "White Sturgeon") & (risk_registry["COSEWIC common name"].isnull()), "COSEWIC common name"] = "White Sturgeon"
 #update the Fraser River population to include the Nechako and Mid Fraser populations
-risk_registry.loc[(risk_registry["Legal common name"] == "White Sturgeon") & (risk_registry["COSEWIC population"] == "Upper Fraser River population"), "COSEWIC population"] = "Upper Fraser River (plus Nechako, Mid Fraser) population"
+risk_registry.loc[
+    (risk_registry["Legal common name"] == "White Sturgeon") & 
+    (risk_registry["COSEWIC population"] == "Upper Fraser River population"),
+    ["COSEWIC population", "Legal population"]
+] = "Upper Fraser River (plus Nechako, Mid Fraser) population"
+
 # merge the rows where the legal population are the same, overwrite the data if the cell entry is NA
+
+
 
 # Only apply merging to "White Sturgeon"
 white_sturgeon = risk_registry[risk_registry["Legal common name"] == "White Sturgeon"]
 
+# remove the unique_id column, it should be made after all changes are done
+white_sturgeon = white_sturgeon.drop(columns=["Unique_ID"])
+
+#White Sturgeon with Legal Population = Lower Fraser, 2 records: Merge together duplicate rows, replacing blank cells with information from other row
+mask = (white_sturgeon["Legal common name"] == "White Sturgeon") & (white_sturgeon["Legal population"] == "Lower Fraser River population")
+# Select only the relevant rows
+sturgeon_subset = white_sturgeon[mask]
+# Merge duplicate rows by filling NaNs with available values
+merged_row = sturgeon_subset.ffill().bfill().drop_duplicates()
+# Drop old rows and replace with the merged row
+white_sturgeon = pd.concat([white_sturgeon[~mask], merged_row], ignore_index=True)
+
+
+#replace the NA with "Non-active" for the COSEWIC status
+white_sturgeon["COSEWIC status"] = white_sturgeon["COSEWIC status"].fillna("Non-active")
+
+
+
+#White Sturgeon with Legal Population = Upper Columbia, 2 records: Delete the record that DOES NOT say COSEWIC Status = Endangered
+
 # Group by "Legal population" and apply merging function to ALL columns
-merged_sturgeon = white_sturgeon.groupby("Legal population", as_index=False).apply(merge_rows).reset_index(drop=True)
+#merged_sturgeon = white_sturgeon.groupby("Legal population", as_index=False).apply(merge_rows).reset_index(drop=True)
+
+# White Sturgeon with Legal Population = Upper Columbia, 2 records: Delete the record that DOES NOT say COSEWIC Status = Endangered
+mask = (white_sturgeon["Legal common name"] == "White Sturgeon") & (white_sturgeon["Legal population"] == "Upper Columbia River population")
+sturgeon_subset = white_sturgeon[mask]
+# Keep the row with COSEWIC status = Endangered
+merged_row = sturgeon_subset[sturgeon_subset["COSEWIC status"] == "Endangered"]
+# Drop old rows and replace with the merged row
+white_sturgeon = pd.concat([white_sturgeon[~mask], merged_row], ignore_index=True)
+
+# Create unique ID, based on Chrissy's logic.
+cosewic_population_filled = (
+    white_sturgeon["COSEWIC population"]
+    .fillna(white_sturgeon["Legal population"])
+    .fillna("NA")
+)
+
+white_sturgeon["Unique_ID"] = (
+    white_sturgeon["Scientific name"]
+    + " - "
+    + white_sturgeon["COSEWIC common name"].fillna(" <blank> ")
+    + " ("
+    + cosewic_population_filled
+    + ")"
+)
+
 
 # Keep all other rows unchanged
 other_species = risk_registry[risk_registry["Legal common name"] != "White Sturgeon"]
 
 # Combine back the merged White Sturgeon data with other species
-risk_registry = pd.concat([merged_sturgeon, other_species], ignore_index=True)
+risk_registry = pd.concat([white_sturgeon, other_species], ignore_index=True)
 
 
 # fix the na to be non-active
@@ -128,7 +189,14 @@ risk_registry.loc[(risk_registry["COSEWIC status"].isnull()), "COSEWIC status"] 
 
 
 risk_registry["COSEWIC population"] = risk_registry["COSEWIC population"].replace("populations", "population")
-
+# Define the regex pattern
+pattern = r"\b[Pp]opulations\b"
+mask = risk_registry.apply(lambda col: col.astype(str).str.contains(pattern, na=False, regex=True)).any(axis=1)
+# Filter and print the rows
+filtered_rows = risk_registry[mask]
+# Drop completely blank rows (if needed)
+filtered_rows = filtered_rows.dropna(how="all")
+print(filtered_rows) 
 
 # %%
 # Time to apply Chrissy's final logic to the federal risk registry:
@@ -172,6 +240,9 @@ cols_remaining = [col for col in all_columns if col not in cols_first]
 risk_registry = risk_registry[cols_first + cols_remaining]
 
 
+
+
+
 #%%
 ### COSEWIC Status reports
 
@@ -196,7 +267,7 @@ status_report["Common name"] = status_report["Common name"].str.extract(
 # Add Domain column
 conditions = [
     status_report["Taxonomic group"].isin(
-        ["Freshwater fishes", "Marine fishes", "Marine mammals"]
+        ["Freshwater fishes", "Marine fishes", "Marine mammals", "Echinodermata"]
     )
     | status_report["Common name"].str.match(
         ".*([aA]balone|[oO]yster|[mM]ussel|[lL]anx|[cC]apshell|Hot Springs Snail|[pP]hysa|[pP]ebblesnail)"
@@ -263,6 +334,11 @@ col_order_merged = ["Unique_ID",
 
 risk_registry_id = set(risk_registry['Unique_ID'])
 status_report = status_report[~status_report["Unique_ID"].isin(risk_registry_id)]
+
+# if the unique id matches between the two tables, then the columns are merged. Replace the value in "Scheduled Assessment" in the risk registry table with the "Scheduled assessment" value in the status report table
+merged_risk_status = pd.merge(risk_registry, status_report[["Unique_ID","Scheduled Assessment"]], on="Unique_ID", how = "outer")
+merged_risk_status["Scheduled Assessment"] = merged_risk_status["Scheduled Assessment"].fillna(" ")
+airfuncs.prioritize_x_column(merged_risk_status)
 
 merged_risk_status = pd.merge(risk_registry, status_report[["Unique_ID","Domain", "Taxonomic group", "Scientific name", "COSEWIC common name",
                                                            "COSEWIC population", "COSEWIC status",
@@ -414,14 +490,6 @@ merged_spp_candidate = merged_spp_candidate[cols_merged_order]
 # link to save the files
 sharepoint_link = r"https://bcgov.sharepoint.com/:f:/r/teams/09277-AquaticSAR/Shared%20Documents/Aquatic%20SAR/SAR%20Data/Airtable%20uploads?csf=1&web=1&e=22KJIf"
 
-##
-# Authentication - Requires Azure app registration
-
-with open("login/sharepointlogin.txt", "r") as text_file:
-    data = text_file.readlines()
-    
-client_id = data[0].strip("\n")
-client_secret = data[1]
 
 # Parse and clean up the URL
 parsed_url = urlparse(sharepoint_link)
@@ -481,6 +549,49 @@ merged_risk_status['Estimated re-assessment'] = merged_risk_status['Estimated re
 #merged_risk_status['Estimated re-assessment'] = merged_risk_status['Estimated re-assessment'].replace(pd.Timestamp('1900-01-01'), " ")
 
 merged_spp_candidate = merged_spp_candidate.fillna("")
+
+
+
+
+# %%
+# Initialize WebDriver (ensure 'chromedriver' is in your PATH)
+# driver = webdriver.Chrome()
+
+# # Open the webpage
+# driver.get(
+#     "https://bcgov.sharepoint.com/"
+# )
+
+# # Wait for the page to load fully
+# time.sleep(1)
+# %%
+
+
+##
+# Authentication - Requires Azure app registration
+
+with open("login/sharepointlogin.txt", "r") as text_file:
+    data = text_file.readlines()
+    
+client_id = data[0].strip("\n")
+client_secret = data[1]
+
+
+# driver.find_element(By.ID, "i0116").send_keys(client_id)
+
+# login_button = driver.find_element(By.XPATH, ('//*[@id="idSIButton9"]')) 
+# login_button.click()
+# time.sleep(1)
+
+# driver.find_element(By.ID, "i0118").send_keys(client_secret)
+# login_button = driver.find_element(By.XPATH, ('//*[@id="idSIButton9"]')) 
+# login_button.click()
+# time.sleep(1)
+
+app_principal = {  
+    'client_id': '--client-id-goes-here--',  
+    'client_secret': '--client-secret-goes-here--',  
+}  
 
 
 
