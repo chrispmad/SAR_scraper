@@ -22,7 +22,21 @@ with open("login/airtable_key.txt") as f:
     token = lines[1].strip()
     print(f"USERNAME = {username}")
     
-    
+ 
+ 
+# Function to clean up NaN values and format "Taxonomic group" as a list
+def clean_row(row):
+    cleaned_row = {}
+    for key, value in row.items():
+        if pd.isna(value):  
+            cleaned_row[key] = None  # Convert NaN to None
+        elif key == "Taxonomic group":  
+            cleaned_row[key] = [item.strip() for item in str(value).split(",")]  # Convert to list
+        elif key == "COSEWIC status":
+            cleaned_row[key] = [item.strip() for item in str(value).split(",")]  # Convert to list   
+        else:
+            cleaned_row[key] = value  
+    return cleaned_row    
 #%%
 
 
@@ -46,36 +60,9 @@ current_records = airfuncs.fetch_records(url, headers, base_id, table_id)
 if current_records:            
     airfuncs.delete_records(url, base_id, table_id, headers, current_records)
     
-# convert all types of file to string - this should be changed later to be appropriate types
-merged_risk_status = merged_risk_status.astype(str) 
-
-merged_risk_status.fillna("NA", inplace=True)  # Use "" for blanks if preferred
-merged_risk_status = merged_risk_status.applymap(lambda x: "NA" if str(x).lower() == "nan" else x)
-merged_risk_status["Date added"] = merged_risk_status["Date added"].fillna("1900-01-01").replace("nan", "1900-01-01").replace("NA", "1900-01-01")
-merged_risk_status["Taxonomic group"] = merged_risk_status["Taxonomic group"].fillna("none").replace("nan", "none").replace("NA", "none")
-merged_risk_status["Last status change"] = merged_risk_status["Last status change"].fillna("1900-01-01").replace("nan", "1900-01-01").replace("NA", "1900-01-01")
-merged_risk_status["Scheduled Assessment"] = merged_risk_status["Scheduled Assessment"].fillna("1900-01-01").replace("nan", "1900-01-01").replace("NA", "1900-01-01").replace("No date found", "1900-01-01")
-merged_risk_status["COSEWIC last assessment date"] = merged_risk_status["COSEWIC last assessment date"].fillna("1900-01-01").replace("nan", "1900-01-01").replace("NA", "1900-01-01")
-merged_risk_status["Estimated re-assessment"] = merged_risk_status["Estimated re-assessment"].fillna("1900-01-01").replace("nan", "1900-01-01").replace("NA", "1900-01-01")
 
 
-merged_risk_status["COSEWIC status"] = merged_risk_status["COSEWIC status"].fillna("none").replace("nan", "none").replace("NA", "none")
-# Function to clean up NaN values and format "Taxonomic group" as a list
-
-
-def clean_row(row):
-    cleaned_row = {}
-    for key, value in row.items():
-        if pd.isna(value):  
-            cleaned_row[key] = None  # Convert NaN to None
-        elif key == "Taxonomic group":  
-            cleaned_row[key] = [item.strip() for item in str(value).split(",")]  # Convert to list
-        elif key == "COSEWIC status":
-            cleaned_row[key] = [item.strip() for item in str(value).split(",")]  # Convert to list   
-        else:
-            cleaned_row[key] = value  
-    return cleaned_row
-
+#merged_risk_status_cleaned = merged_risk_status.apply(clean_row, axis=1)
 
 #%%
 
@@ -88,16 +75,20 @@ def clean_row(row):
 multiple_select_fields = ["COSEWIC status", "Taxonomic group"]
 
 for index, row in merged_risk_status.iterrows():
-    row_dict = row.to_dict()
+    row_dict = clean_row(row.to_dict())  # Apply clean_row function
 
-    # Convert multiple select fields to lists if they are not already
+    # Ensure multiple select fields are single strings (pick first value if list)
     for field in multiple_select_fields:
-        if field in row_dict and isinstance(row_dict[field], str):  
-            row_dict[field] = [item.strip() for item in row_dict[field].split(",")]
+        if field in row_dict:
+            if isinstance(row_dict[field], list):  
+                row_dict[field] = row_dict[field][0] if row_dict[field] else None  # Convert list to single value
+            elif isinstance(row_dict[field], str):
+                row_dict[field] = row_dict[field].strip()  # Ensure it's a clean string
 
-    data = {"fields": row_dict}  
+    data = {"fields": row_dict}
 
-    #print(f"Uploading row {index}: {json.dumps(data, indent=2)}")
+    
+    #print(f"Uploading row {index}: {json.dumps(data, indent=2)}")  # Debugging
 
     try:
         response = requests.post(url, headers=headers, data=json.dumps(data), timeout=10)
@@ -105,13 +96,13 @@ for index, row in merged_risk_status.iterrows():
         if response.status_code != 200:
             print(f"Error uploading row {index}: {response.json()}")
 
-        time.sleep(0.2)  # Small delay to prevent rate limits
+        time.sleep(0.2)
 
     except requests.exceptions.Timeout:
-        print(f"Timeout error for row {index}: Server took too long to respond.")
+        print(f"Timeout error for row {index}")
     except requests.exceptions.RequestException as e:
-        print(f"Network error while uploading row {index}: {e}")
-        break  # Stop if there's a major issue
+        print(f"Network error: {e}")
+        break
 
 
 
@@ -123,6 +114,8 @@ for index, row in merged_risk_status.iterrows():
 base_id = 'applZn1P0abVQM8NC' # the base of the workspace - change as appropriate 
 table_id = 'tblESIlv9ie05ab7z' # Risk registry
 
+
+multiple_select_fields = ["Candidate list", "Priority"]
 
 url = f"https://api.airtable.com/v0/{base_id}/{table_id}"
 headers = {
@@ -137,23 +130,37 @@ current_records = airfuncs.fetch_records(url, headers, base_id, table_id)
 if current_records:            
     airfuncs.delete_records(url, base_id, table_id, headers, current_records)
     
-# convert all types of file to string - this should be changed later to be appropriate types
-merged_spp_candidate = merged_spp_candidate.astype(str) 
-merged_spp_candidate = merged_spp_candidate.applymap(lambda x: "NA" if str(x).lower() == "nan" else x)
-merged_spp_candidate["Date nominated"] = merged_spp_candidate["Date nominated"].fillna(" ").replace("nan", " ").replace("NA", " ")
-
 
 
 #upload the new file
 for index, row in merged_spp_candidate.iterrows():
-    data = {"fields": row.to_dict()}
+    row_dict = clean_row(row.to_dict())  # Apply clean_row function
 
+    # Ensure multiple select fields are single strings (pick first value if list)
+    for field in multiple_select_fields:
+        if field in row_dict:
+            if isinstance(row_dict[field], list):  
+                row_dict[field] = row_dict[field][0] if row_dict[field] else None  # Convert list to single value
+            elif isinstance(row_dict[field], str):
+                row_dict[field] = row_dict[field].strip()  # Ensure it's a clean string
+
+    # Convert "Taxonomic group" to a string if it's a list
+    if "Taxonomic group" in row_dict and isinstance(row_dict["Taxonomic group"], list):
+        row_dict["Taxonomic group"] = ", ".join(row_dict["Taxonomic group"])  # Convert list to a comma-separated string
+
+    # Convert "Date nominated" to an integer (year only) **without a function**
+    if "Date nominated" in row_dict:
+        try:
+            row_dict["Date nominated"] = int(row_dict["Date nominated"])  # Convert directly
+        except (ValueError, TypeError):
+            row_dict["Date nominated"] = None  # Handle invalid values
     
-    #print(data)
+    data = {"fields": row_dict}
+
     response = requests.post(url, headers=headers, data=json.dumps(data))
 
     if response.status_code != 200:
-      print(f"Error uploading row {index}: {response.json()}")
+        print(f"Error uploading row {index}: {response.json()}")
 
     time.sleep(0.2)  # Add a delay between requests
 

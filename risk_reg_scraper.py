@@ -65,6 +65,6 @@ if matching_file:
 else:
     print("No files found matching the pattern.")
 
-#driver.quit()
+driver.quit()
 
 # %%

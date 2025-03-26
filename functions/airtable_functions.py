@@ -137,7 +137,7 @@ def determine_cosewic_domain(row):
             return "Terrestrial"
     elif any(
         group in taxonomic_group
-        for group in ["Fishes (freshwater)", "Fishes (marine)", "Mammals (marine)"]
+        for group in ["Fishes (freshwater)", "Fishes (marine)", "Mammals (marine)", "Echinodermata"]
     ):
         return "Aquatic"
     elif any(
@@ -202,7 +202,7 @@ def cList_Domain_col(row):
                         "hot springs snail", "physa", "pebblesnail"}
     
     aquatic_groups = {"fishes (freshwater)", "fishes (marine)", "mammals (marine)", 
-                      "marine fishes", "freshwater fishes", "marine mammals"}
+                      "marine fishes", "freshwater fishes", "marine mammals", "echinodermata"}
 
     terrestrial_groups = {"amphibians", "arthropods", "birds", "lichens", 
                           "mammals (terrestrial)", "mosses", "reptiles", 
@@ -244,7 +244,7 @@ def determine_domain_general(row):
     elif any(
         group.lower() in taxonomic_group.lower()
         for group in ["fishes (freshwater)", "fishes (marine)", "mammals (marine)",
-                      "Marine fishes"]
+                      "Marine fishes", "echinodermata"]
     ):
         return "Aquatic"
     elif any(
