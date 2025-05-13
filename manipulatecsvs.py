@@ -34,26 +34,49 @@ status_report = pd.read_csv(
 )
 species_tbl = pd.read_csv("data/candidate_species_tbl.csv", encoding="ISO-8859-1")
 
+#The risk registry uses the old scientific name for Snowy owl, so this has been replaced
+risk_registry["Scientific name"] = risk_registry["Scientific name"].str.replace(
+    "Bubo scandiaca", "Bubo scandiacus", regex=False
+)
+
+risk_registry["COSEWIC common name"] = risk_registry["COSEWIC common name"].str.replace(
+    "Rocky Mountain Ridged Mussel", "Western Ridged Mussel", regex=False
+)
+
+risk_registry["Legal common name"] = risk_registry["Legal common name"].str.replace(
+    "Rocky Mountain Ridged Mussel", "Western Ridged Mussel", regex=False
+)
+
+status_report["Common name"] = status_report["Common name"].str.replace(
+    "Liard Hot Springs Snail", "Hotwater Physa", regex=False
+)
+
+status_report["Common name"] = status_report["Common name"].str.replace(
+    "Oldgrowth Specklebelly", "Oldgrowth Specklebelly Lichen", regex=False
+)
 
 
 
 
-# BC / Pacific Filter
-risk_registry = risk_registry[
-    risk_registry["Range"].str.contains(
-        r"(BC|British Columbia|Pacific|British)", na=False
-    )
-]
+# # BC / Pacific Filter
+# risk_registry = risk_registry[
+#     risk_registry["Range"].str.contains(
+#         r"(BC|British Columbia|Pacific|British)", na=False
+#     )
+# ]
+
+# status_report = status_report[
+#     status_report["Canadian range / known or potential jurisdictions 1"].str.contains(
+#         r"(BC|British Columbia|Pacific|British)", na=False
+#     )
+# ]
+
 candidate_list = candidate_list[
     candidate_list["Location"].str.contains(
         r"(BC|British Columbia|Pacific|British)", na=False
     )
 ]
-status_report = status_report[
-    status_report["Canadian range / known or potential jurisdictions 1"].str.contains(
-        r"(BC|British Columbia|Pacific|British)", na=False
-    )
-]
+
 species_tbl = species_tbl[
     species_tbl["Canadian range / known or potential jurisdictions"].str.contains(
         r"(BC|British Columbia|Pacific|British)", na=False
@@ -266,9 +289,14 @@ status_report["Unique_ID"] = (
 # Pull out Population from 'Common name' column, save to new column.
 status_report["Population"] = status_report["Common name"].str.extract(r"\((.*?)\)")
 
+#replace the "-" with " - " in the population column
+status_report["Population"] = status_report["Population"].str.replace(
+    r'(?<!\s)-(?=\S)|(?<=\S)-(?!\s)', ' - ', regex=True
+)
+
 # Remove population and the surrounding parentheses from Common name column.
 status_report["Common name"] = status_report["Common name"].str.extract(
-    r"([a-zA-Z \-']*)"
+    r"([a-zA-Z \-']*)" 
 )
 
 status_report["Taxonomic group"] = status_report["Taxonomic group"].str.replace(
@@ -392,6 +420,17 @@ for col in columns_to_update:
         # Use combine_first to fill NaN in risk_registry with values from status_report
         merged_risk_status[col] = merged_risk_status[col].combine_first(merged_risk_status[status_col])
 
+
+merged_risk_status = merged_risk_status[
+    merged_risk_status["Range_status"].str.contains(
+        r"(BC|British Columbia|Pacific|British)", na=False
+    ) |
+    merged_risk_status["Range"].str.contains(
+        r"(BC|British Columbia|Pacific|British)", na=False
+    )
+]
+
+
 # Drop extra columns from status_report (e.g., 'Domain_status', 'Range_status')
 merged_risk_status = merged_risk_status.drop(columns=[f"{col}_status" for col in columns_to_update if f"{col}_status" in merged_risk_status])
 
@@ -465,6 +504,7 @@ cols_sp_first = [
     "Date_nominated",
     "Rationale",
 ]
+
 
 # Get all remaining columns that are not in cols_sp_first
 cols_remaining = [col for col in species_tbl.columns if col not in cols_sp_first]
