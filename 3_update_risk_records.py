@@ -23,17 +23,17 @@ table_id = 'tblPDiZ80zCvQrIUD'  # Main table ID
 merg_risk_status_update = pd.read_csv("output/risk_status_merged.csv", encoding='utf-8-sig')
 merg_risk_status_update.fillna("NA", inplace=True)
 
-
+#%% 
 url = f"https://api.airtable.com/v0/{base_id}/{table_id}"
 headers = {
     "Authorization": f"Bearer {token}",
     "Content-Type": "application/json"
 }
 
-
+#%% 
 all_records = update_funcs.fetch_all_records(url, headers)
 
-
+#%% 
 
 date_fields = [
     "COSEWIC last assessment date", "Estimated re-assessment", "Scheduled Assessment",
@@ -47,5 +47,6 @@ for field in category_fields:
         {pd.NA: "none", None: "none", "nan": "none", "NA": "none"}
     )
 
+#%% 
 update_funcs.update_rows(merg_risk_status_update, date_fields, url, headers, all_records)
 # %%

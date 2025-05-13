@@ -36,7 +36,11 @@ species_tbl = pd.read_csv("data/candidate_species_tbl.csv", encoding="ISO-8859-1
 
 
 
+# Note! Some species don't list BC in the risk registry Range column, BUT those species
+# are listed as living in BC in the 'status report' table. Find those species to make sure
+# we don't accidentally delete them from the risk registry!
 
+species_to_retain_in_risk_registry
 
 # BC / Pacific Filter
 risk_registry = risk_registry[
