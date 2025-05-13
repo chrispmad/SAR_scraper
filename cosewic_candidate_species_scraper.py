@@ -60,7 +60,6 @@ for h3 in h3_elements:
 
         # Try to expand the section by clicking the <a> child element
         try:
-            #child_div = h3.find_element(By.TAG_NAME, "a")
             if h3.get_attribute("class") == "text-success":
                 ActionChains(driver).move_to_element(h3).click().perform()
                 time.sleep(2)  # Small delay to allow content to load
@@ -88,20 +87,20 @@ for h3 in h3_elements:
             species_data = lines[i : i + 6]  # Get the next 6 lines
 
             if len(species_data) == 6:  # Ensure it's a complete entry
-                # Extract key-value pairs from the lines
-                row = {
-                    key_value.split(":", 1)[0]
-                    .strip(): key_value.split(":", 1)[1]
-                    .strip()
-                    for key_value in species_data
-                }
+                # Safely extract key-value pairs
+                row = {}
+                for key_value in species_data:
+                    parts = key_value.split(":", 1)
+                    key = parts[0].strip()
+                    value = parts[1].strip() if len(parts) > 1 else ""
+                    row[key] = value
 
                 # Add the category as a column
                 row["Category"] = section_name
 
                 # Add the row to the data list
                 data.append(row)
-
+                
 # Convert the collected data into a DataFrame
 df = pd.DataFrame(data)
 
