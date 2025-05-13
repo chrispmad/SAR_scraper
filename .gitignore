@@ -15,3 +15,8 @@ output/col_names/risk_status_colnames.csv
 scripts/R/upload_sharepoint.R
 functions/__pycache__/update_funcs.cpython-312.pyc
 functions/__pycache__/airtable_functions.cpython-312.pyc
+data/candidate_species_tbl.csv
+data/cosewic_status_reports_prep.csv
+data/risk_registry.csv
+output/merged_spp_candidate.csv
+output/risk_status_merged.csv
