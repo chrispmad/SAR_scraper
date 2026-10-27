@@ -20,3 +20,4 @@ data/cosewic_status_reports_prep.csv
 data/risk_registry.csv
 output/merged_spp_candidate.csv
 output/risk_status_merged.csv
+*.csv

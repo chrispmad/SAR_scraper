@@ -15,8 +15,8 @@ with open("login/airtable_key.txt") as f:
     username = lines[0].strip()
     token = lines[1].strip()
 
-base_id = 'applZn1P0abVQM8NC'
-table_id = 'tblESIlv9ie05ab7z'  # Main table ID
+base_id = 'appG6K0E6qSDh7h4O'
+table_id = 'tblAbfnQDSMqiajB0'  # Main table ID
 
 #candidate_update = pd.read_csv("data/candidate_species_tbl_update_test.csv")
 candidate_update = pd.read_csv("output/merged_spp_candidate.csv")
@@ -43,6 +43,7 @@ candidate_update["Date nominated"] = candidate_update["Date nominated"].replace(
 
 candidate_update["Date nominated"] = pd.to_numeric(candidate_update["Date nominated"], errors='coerce')
 candidate_update["Date nominated"] = candidate_update["Date nominated"].fillna(9999)
+#%%
 
 update_funcs.update_rows(candidate_update, date_fields, url, headers, all_records)
 

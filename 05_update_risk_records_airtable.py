@@ -15,8 +15,8 @@ with open("login/airtable_key.txt") as f:
     username = lines[0].strip()
     token = lines[1].strip()
 
-base_id = 'applZn1P0abVQM8NC'
-table_id = 'tblPDiZ80zCvQrIUD'  # Main table ID
+base_id = 'appG6K0E6qSDh7h4O'
+table_id = 'tbl3U6Sskc8co8Y5S'  # Main table ID
 
 # Load update data
 #merg_risk_status_update = pd.read_csv("data/species_at_risk_update_test.csv", encoding='utf-8-sig').astype(str)
@@ -46,6 +46,8 @@ for field in category_fields:
     merg_risk_status_update[field] = merg_risk_status_update[field].replace(
         {pd.NA: "none", None: "none", "nan": "none", "NA": "none"}
     )
+
+#%%
 
 update_funcs.update_rows(merg_risk_status_update, date_fields, url, headers, all_records)
 # %%

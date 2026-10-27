@@ -50,6 +50,9 @@ for the_year in range(2019,2030):
         h3_elements.append(the_element)
 #h3_elements = driver.find_element(By.CSS_SELECTOR,"[href='#Y2019']")
 
+
+#%%
+
 for h3 in h3_elements:
     # Extract the section name from the <h3> element
     section_name = h3.text.strip()
@@ -104,113 +107,60 @@ for h3 in h3_elements:
 # Convert the collected data into a DataFrame
 df = pd.DataFrame(data)
 
-# Print the DataFrame to verify
-print(df)
-
 # %%
 todays_date = date.today().strftime('%Y-%m-%d')
 df.to_csv("data/candidate_species_tbl"+todays_date+".csv")
 df.to_csv("data/candidate_species_tbl.csv")
     
+    
+    
+    
 #%%
-table_xpath = "//*[@id='ca-1529739248826']/main/div/div[2]/table"
-table_element = driver.find_element(By.XPATH, table_xpath) 
-table_data = []
-
- 
- 
- 
- 
-def parse_table(table_element):
-    table_data = []
-    previous_h3 = ""
-    previous_strong = ""
-
-    for row in table_element.find_elements(By.TAG_NAME, "tr"):
-        cells = row.find_elements(By.TAG_NAME, "td")
-
-        if not cells:
+def scrape_ssc_tables(driver):
+    rows = []
+    for table in driver.find_elements(By.TAG_NAME, "table"):
+        try:
+            heading = table.find_element(By.XPATH, "preceding::h2[1]").text.strip()
+        except NoSuchElementException:
             continue
+        m = re.search(r"\((\d+)\)\s*$", heading)
+        if not m:
+            continue                      # skips non-taxon tables
+        taxon = re.sub(r"\s*\(\d+\)\s*$", "", heading)
+        expected = int(m.group(1))
 
-        # Check if the row contains only one cell with an h3 or strong element
-        if len(cells) == 1:
-            single_cell = cells[0]
-            h3_elements = single_cell.find_elements(By.TAG_NAME, "h3")
-            strong_elements = single_cell.find_elements(By.TAG_NAME, "strong")
+        priority = None
+        n_rows = 0
+        for tr in table.find_elements(By.TAG_NAME, "tr"):
+            cells = tr.find_elements(By.TAG_NAME, "td")
+            if not cells:
+                continue
+            texts = [c.text.strip() for c in cells]
 
-            if h3_elements:
-                previous_h3 = h3_elements[0].text.strip()
-                continue  # Skip to the next row
-            elif strong_elements:
-                previous_strong = strong_elements[0].text.strip()
-                continue  # Skip to the next row
+            # priority label row: only the first cell has text
+            if not any(texts[1:]):
+                if texts[0] and "no candidates currently listed" not in texts[0].lower():
+                    priority = texts[0]
+                continue
 
-        # Process rows with multiple cells or rows without h3/strong in the first cell
-        current_row_data = []
-        for cell in cells:
-            h3_text = ""
-            strong_text = ""
-            cell_text = cell.text.strip()
+            bold = bool(cells[0].find_elements(By.CSS_SELECTOR, "strong, b"))
+            rows.append({
+                "Group": taxon,
+                "Priority": priority,
+                "Common name": texts[0],
+                "Scientific name": texts[1],
+                "Location": texts[2],
+                "Selected for assessment": bold,
+            })
+            n_rows += 1
 
-            h3_elements = cell.find_elements(By.TAG_NAME, "h3")
-            if h3_elements:
-                h3_text = h3_elements[0].text.strip()
-            else:
-                h3_text = previous_h3
+        flag = "" if n_rows == expected else f"  <-- heading says {expected}"
+        print(f"{taxon}: {n_rows} rows{flag}")
 
-            strong_elements = cell.find_elements(By.TAG_NAME, "strong")
-            if strong_elements:
-                strong_text = strong_elements[0].text.strip()
-            else:
-                strong_text = previous_strong
+    return pd.DataFrame(rows)
 
-            current_row_data.append((h3_text, strong_text, cell_text))
 
-        table_data.append(current_row_data)
-
-    return table_data
-
-table_data = parse_table(table_element)
-
-# get rid of the numbers in front of the type of organism
-def clean_category(category):
-    return re.sub(r'\(\d+\)', '', category).strip()
-
-#naming the items in the lists so they can be referred to. Species also includes location
-def tuple_to_dict(tup):
-    return {
-        'category': clean_category(tup[0]),
-        'priority': tup[1],
-        'species': tup[2] if len(tup) > 2 else ''
-    }
-    
-# Process the data and store in rows for CSV
-csv_data = []
-for sublist in table_data:
-    dict_list = [tuple_to_dict(tup) for tup in sublist]
-    
-    # Organize each row in the desired order
-    row = [
-        dict_list[0]['category'],               # Cleaned Category
-        dict_list[0]['priority'],               # Priority group
-        *(d['species'] for d in dict_list)      # Species and location
-    ]
-    csv_data.append(row)
-#header names for the csv file
-
-# Convert list to DataFrame
-df = pd.DataFrame(csv_data, columns=["col1", "group", "species", "scientific_name", "regions"])
-# Identify rows that define a new category (category name is in column 2, others are NaN)
-df["category"] = df["species"].where(df["scientific_name"].isna())  # Extract categories
-df["category"] = df["category"].fillna(method="ffill")  # Forward-fill category to other rows
-df = df.drop(columns=["col1"])
-
-# Remove category-defining rows (rows where scientific_name is NaN)
-df = df.dropna(subset=["scientific_name"])
-
-df = df.rename(columns={"species": "Common name", "scientific_name": "Scientific name", "regions": "Location", "category": "Group"})
-
-df["Group"] = df["Group"].str.replace(r"\s*\(.*?\)", "", regex=True)
+df = scrape_ssc_tables(driver)
 
 header = ['Group', 'Priority', 'Common name', 'Scientific name', 'Location',]
 

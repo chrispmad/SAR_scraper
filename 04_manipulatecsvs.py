@@ -57,7 +57,7 @@ status_report["Common name"] = status_report["Common name"].str.replace(
 
 
 
-
+#%%
 # # BC / Pacific Filter
 # risk_registry = risk_registry[
 #     risk_registry["Range"].str.contains(
@@ -309,7 +309,7 @@ conditions = [
         ["Freshwater fishes", "Marine fishes", "Marine mammals", "Echinodermata"]
     )
     | status_report["Common name"].str.match(
-        ".*([aA]balone|[oO]yster|[mM]ussel|[lL]anx|[cC]apshell|Hot Springs Snail|[pP]hysa|[pP]ebblesnail)"
+        ".*([aA]balone|[oO]yster|[mM]ussel|[lL]anx|[cC]apshell|Hot Springs Snail|[pP]hysa|[pP]ebblesnail|[lL]iard Hot Springs Snail)|[aA]shy [pP]ebblesnail"
     ),
     status_report["Taxonomic group"].isin(
         [
@@ -320,7 +320,7 @@ conditions = [
             "Terrestrial mammals",
             "Mosses",
             "Reptiles",
-            "Vascular plants",
+            "Vascular Plants",
         ]
     ),
 ]
@@ -387,62 +387,67 @@ def extract_status(text):
 
 status_report["COSEWIC status"] = status_report["COSEWIC last assessment"].apply(extract_status)
 status_report["COSEWIC last assessment corrected"] = status_report["COSEWIC last assessment"].apply(extract_month_year)
-
-
+status_report["Unique_ID"] = status_report.apply(lambda row: f"{row['Scientific name']} - {row['COSEWIC common name'] or '<blank>'}", axis = 1)
+status_report["Range"] = status_report["Canadian range / known or potential jurisdictions"]
 
 #Merge the tables here
+
+
+
+
+
 #%%
 
-# Merge while keeping both sets of columns
+
+for df in (risk_registry, status_report):
+    df["Unique_ID"] = df["Unique_ID"].astype(str).str.strip()
+
+# 2️⃣ Select only the columns from status_report that we care about
+status_cols = [
+    "Unique_ID", "Domain", "Taxonomic group", "Scientific name",
+    "COSEWIC common name", "COSEWIC population", "COSEWIC status",
+    "Scheduled Assessment", "Range"
+]
+
+# 3️⃣ Outer merge to keep all rows from both tables
 merged_risk_status = pd.merge(
     risk_registry,
-    status_report[[  # Selecting the necessary columns from status_report
-        "Unique_ID", "Domain", "Taxonomic group", "Scientific name",
-        "COSEWIC common name", "COSEWIC population", "COSEWIC status",
-        "Scheduled Assessment", "Range"  # Add any other columns that might have missing values
-    ]],
+    status_report[status_cols],
     on="Unique_ID",
     how="outer",
-    suffixes=("", "_status")  # Keep distinct column names for status_report
+    suffixes=("_risk", "_status")
 )
 
-# List of columns to update from status_report, including "Range" and others
-columns_to_update = [
+# 4️⃣ List of overlapping columns to coalesce
+columns_to_coalesce = [
     "Domain", "Taxonomic group", "Scientific name", 
     "COSEWIC common name", "COSEWIC population", 
     "COSEWIC status", "Scheduled Assessment", "Range"
 ]
 
-# Fill missing values in risk_registry with status_report ONLY IF risk_registry has NaN
-for col in columns_to_update:
-    status_col = f"{col}_status"  # The column from status_report
-    if status_col in merged_risk_status:
-        # Use combine_first to fill NaN in risk_registry with values from status_report
-        merged_risk_status[col] = merged_risk_status[col].combine_first(merged_risk_status[status_col])
+# 5️⃣ Coalesce columns: prefer status_report values if present
+for col in columns_to_coalesce:
+    risk_col = f"{col}_risk"
+    status_col = f"{col}_status"
+    if risk_col in merged_risk_status and status_col in merged_risk_status:
+        merged_risk_status[col] = merged_risk_status[status_col].combine_first(merged_risk_status[risk_col])
+    elif status_col in merged_risk_status:
+        merged_risk_status[col] = merged_risk_status[status_col]
 
+# 6️⃣ Drop the original suffixed columns
+cols_to_drop = [f"{col}_risk" for col in columns_to_coalesce] + [f"{col}_status" for col in columns_to_coalesce]
+merged_risk_status.drop(columns=[c for c in cols_to_drop if c in merged_risk_status], inplace=True)
 
+# 7️⃣ Apply your Range filter
 merged_risk_status = merged_risk_status[
-    merged_risk_status["Range_status"].str.contains(
-        r"(BC|British Columbia|Pacific|British)", na=False
-    ) |
-    merged_risk_status["Range"].str.contains(
-        r"(BC|British Columbia|Pacific|British)", na=False
-    )
+    merged_risk_status["Range"].str.contains(r"(BC|British Columbia|Pacific|British)", na=False)
 ]
 
+# 8️⃣ Fill remaining missing values (optional)
+merged_risk_status = merged_risk_status.fillna("NA")
 
-# Drop extra columns from status_report (e.g., 'Domain_status', 'Range_status')
-merged_risk_status = merged_risk_status.drop(columns=[f"{col}_status" for col in columns_to_update if f"{col}_status" in merged_risk_status])
-
-# Fill any remaining missing values across the merged dataframe (optional, if you want to apply a global fill for missing values)
-merged_risk_status = merged_risk_status.fillna("NA")  # Or use another placeholder or method as needed
-
-# This function will take the newly merged table and retain anything that is in risk_registry but also in status_reports
+# 9️⃣ Apply your prioritize_x_column function if you still have other _x/_y columns
 airfuncs.prioritize_x_column(merged_risk_status)
-
-# if
-
-#merged_risk_status = merged_risk_status[col_order_merged]
 
 
 # %%
@@ -458,10 +463,6 @@ airfuncs.prioritize_x_column(merged_risk_status)
 
 
 # This is part 2 COSEWIC candidate list table
-
-
-
-
 
 
 species_tbl["Unique_ID"] = species_tbl.apply(lambda row: f"{row['Scientific name']} - {row['Common name'] or '<blank>'}", axis = 1)
@@ -567,10 +568,33 @@ species_tbl = species_tbl.rename(columns={"Date_nominated": "Date nominated"})
 species_tbl_unique = set(species_tbl['Unique_ID'])
 #candidate_list = candidate_list[~candidate_list["Unique_ID"].isin(species_tbl_unique)]
 
-merged_spp_candidate = species_tbl.merge(candidate_list, on = 'Unique_ID', how = 'outer')
 
 
-airfuncs.prioritize_x_column(merged_spp_candidate)
+# Merge with suffixes to distinguish columns with the same name
+merged = species_tbl.merge(candidate_list, on='Unique_ID', how='outer', suffixes=('_species', '_candidate'))
+
+# Get all column base names except 'Unique_ID'
+all_cols = set([col[:-8] if col.endswith('_species') else col[:-10] if col.endswith('_candidate') else col
+                for col in merged.columns if col != 'Unique_ID'])
+
+for col in all_cols:
+    col_species = col + '_species'
+    col_candidate = col + '_candidate'
+
+    # If both versions exist, fill missing in species column with candidate column values
+    if col_species in merged.columns and col_candidate in merged.columns:
+        merged[col] = merged[col_species].combine_first(merged[col_candidate])
+    # If only one version exists, just use that
+    elif col_species in merged.columns:
+        merged[col] = merged[col_species]
+    elif col_candidate in merged.columns:
+        merged[col] = merged[col_candidate]
+
+# Drop intermediate columns
+cols_to_drop = [col for col in merged.columns if col.endswith('_species') or col.endswith('_candidate')]
+merged.drop(columns=cols_to_drop, inplace=True)
+
+# Now merged has Unique_ID plus columns prioritized by species_tbl values
 
 cols_merged_order = [
     "Unique_ID",
@@ -587,7 +611,7 @@ cols_merged_order = [
 
 cols_remaining = [col for col in species_tbl.columns if col not in cols_merged_order]
 
-merged_spp_candidate = merged_spp_candidate[cols_merged_order]
+merged_spp_candidate = merged[cols_merged_order]
 
 # %%
 
@@ -694,3 +718,4 @@ df.to_csv("output/col_names/spp_candidate_colnames"+todays_date+".csv", index = 
 
 
 # %%
+
